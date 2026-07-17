@@ -330,7 +330,7 @@ Phase 4: インタビュー（カスタム投稿タイプ + ACF）
 Phase 5: 下層固定ページ
 ====================================================================
 
-[ ] Phase 5.1 PageHero（下層共通ヒーロー）の実装
+[~] Phase 5.1 PageHero（下層共通ヒーロー）の実装（2026-07-17 実装完了）
     対象: template-parts/page-hero.php, assets/js/page-hero.js
     内容: PageHero.tsx を移植。GiantWord(title, right)、物理演算ステージ
           （WORD_PIECES, startOffset160）、eyebrow「AISHIN INC. — RECRUIT SITE」、
@@ -339,7 +339,7 @@ Phase 5: 下層固定ページ
           →浮遊ループ(y-8 2.6s)。titleJa/lead 引数対応（現状未使用だが仕様維持）。
     完了条件: SERVICE/WORKS/CAREER/ENTRY のヒーローがReact版と一致。
 
-[ ] Phase 5.2 SERVICEページの実装
+[~] Phase 5.2 SERVICEページの実装（2026-07-17 実装完了）
     対象: page-service.php
     内容: Service.tsx を移植。svc-intro（「発明は、3つの現場で起こる。」+本文）、
           SERVICES 3件（Strategy Consulting / DX Acceleration / New Business
@@ -352,7 +352,7 @@ Phase 5: 下層固定ページ
           body data-skew-targets=".svc__points, .svc__steps"。
     完了条件: React版 /service と全文・構造・アニメが一致。
 
-[ ] Phase 5.3 WORKSページの実装
+[~] Phase 5.3 WORKSページの実装（2026-07-17 実装完了）
     対象: page-works.php
     内容: Works.tsx を移植。svc-intro（「成果で語る、挑戦の記録。」+本文）、
           WORKS 5件（製造/小売/スタートアップ/医療/物流 — titleLines の改行位置、
@@ -363,7 +363,7 @@ Phase 5: 下層固定ページ
           body data-skew-targets=".wrk__rows"。
     完了条件: React版 /works と全文・構造・カウントアップが一致。
 
-[ ] Phase 5.4 CAREERページの実装
+[~] Phase 5.4 CAREERページの実装（2026-07-17 実装完了）
     対象: page-career.php
     内容: Career.tsx を移植。svc-intro（「成長に、終わりはないから。」+本文）、
           CAREER_ITEMS 4件（見出しの改行位置含め全文転記。01-02は画像左
@@ -374,7 +374,9 @@ Phase 5: 下層固定ページ
           body data-skew-targets=".crr__benefits"。
     完了条件: React版 /career と全文・構造が一致。
 
-[ ] Phase 5.5 ENTRYページ（ダミーフォーム）の実装
+[~] Phase 5.5 ENTRYページ（ダミーフォーム）の実装
+    （2026-07-17 実装完了。フォーム/送信後画面の切替用に .ent__main ラッパーを
+      追加（CSSに影響しないことを確認済み。.entにcontainer直下依存セレクタなし））
     対象: page-entry.php, assets/js/entry-form.js
     内容: Entry.tsx を移植。PageHero(ENTRY)、GiantWord JOIN US(right)、
           リード文・注意書き、フォーム7項目（select: ENTRY_TYPES 5択 /
@@ -391,13 +393,14 @@ Phase 5: 下層固定ページ
     完了条件: React版 /entry とフォーム挙動（エラー表示・活性制御・done画面）
               が完全一致。
 
-[ ] Phase 5.6 404ページの実装
+[~] Phase 5.6 404ページの実装（2026-07-17 実装完了）
     対象: 404.php
     内容: ComingSoon.tsx を移植（title「NOT FOUND」/ jp「ページが見つかりません」/
           「このページは現在準備中です。」/ ← BACK TO TOP）。
     完了条件: 存在しないURLでReact版の NOT FOUND 表示と一致。
 
-[ ] Phase 5.7 固定ページ・表示設定のセットアップスクリプト
+[~] Phase 5.7 固定ページ・表示設定のセットアップスクリプト
+    （2026-07-17 実装完了（冪等）。実行はDocker導入後）
     対象: seed/seed-pages.php, README.md
     内容: WP-CLI で固定ページ service / works / career / entry を作成し
           各テンプレートを割当、フロントページ表示用の空ページ作成+
