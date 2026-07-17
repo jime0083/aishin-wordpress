@@ -1,0 +1,470 @@
+====================================================================
+progress.txt — AI作業タスク一覧（WordPress版 アイシンコーポレートサイト）
+====================================================================
+運用ルール:
+- ステータス: [ ] 未着手 / [~] 作業中 / [x] 完了（完了時に日付を追記）
+- 各タスクは Sonnet クラスで実装可能な粒度（対象ファイル・内容・完了条件を明記）
+- デザインの正は /Users/jime0083/aishin のソースコード。迷ったら必ず参照する
+- 問題発生時は problem.txt に P番号で記録してから修正する
+
+使用ライブラリ（テーマ同梱・バージョン固定）:
+- GSAP 3.15.0 / ScrollTrigger 3.15.0
+  ※package.json の指定は ^3.12.5 だが、React版 node_modules に実際に
+    インストールされ動作しているのは 3.15.0 のため、実動バージョンに合わせた
+    （2026-07-17 Phase 1.6 で確認・決定）
+- matter-js 0.20.0
+- WordPress 6.x / ACF（Advanced Custom Fields）無料版
+
+====================================================================
+Phase 1: 基盤構築（ローカル環境・テーマ雛形・素材・CSS）
+====================================================================
+
+[~] Phase 1.1 Docker ローカルWordPress環境の構築
+    （2026-07-17 ファイル作成完了。動作確認は Work 1.1 Docker Desktop
+      インストール待ち。wpcli サービスも追加済み）
+    対象: docker-compose.yml, .gitignore, README.md
+    内容: services = wordpress(latest, port 8000) / db(mysql:8.0) / phpmyadmin(port 8080)。
+          ./wp-content/themes/aishin を /var/www/html/wp-content/themes/aishin にマウント。
+          環境変数（DB名/ユーザー/パスワード）は開発用固定値でOK（本番とは無関係）。
+          .gitignore に wp本体・DBデータ・.DS_Store 等を追加。
+    完了条件: docker compose up -d 後 http://localhost:8000 でWPインストール画面が
+              表示され、日本語でインストール完了できる。
+
+[~] Phase 1.2 テーマ雛形「aishin」の作成
+    （2026-07-17 ファイル作成完了。有効化確認はDocker起動後）
+    対象: wp-content/themes/aishin/{style.css, functions.php, index.php,
+          front-page.php(仮), header.php(仮), footer.php(仮)}
+    内容: style.css にテーマヘッダーコメント（Theme Name: aishin 等）。
+          functions.php: add_theme_support('title-tag') は使わず後続タスクで
+          React版と同一の<title>を固定出力する方針のためコメントで明記。
+          post-thumbnails サポート、アセットenqueueの骨組み関数を用意。
+    完了条件: 管理画面 外観>テーマ で aishin を有効化でき、フロントに
+              仮テキストが表示される。
+
+[x] Phase 1.3 画像素材のコピー（2026-07-17 完了・diff -r で完全一致確認済み）
+    対象: wp-content/themes/aishin/assets/images/
+    内容: /Users/jime0083/aishin/public/images/ 配下を丸ごとコピー
+          （opt/ の22枚のJPG + logo.png, logo-footer.png, logo-mark.png,
+          ロゴ*.png。README.txt と .DS_Store は除外）。
+    完了条件: diff -r で元フォルダと画像ファイルが完全一致（バイト一致）。
+
+[x] Phase 1.4 CSS 3ファイルの無改変移植（2026-07-17 完了・diffで完全一致確認済み）
+    対象: assets/css/global.css, assets/css/home.css, assets/css/subpage.css
+    内容: /Users/jime0083/aishin/src/styles/ の3ファイルを1文字も変えずコピーし、
+          functions.php で global → home → subpage の順に enqueue（main.tsx の
+          import順と同じ）。style.css（テーマヘッダー用）にはスタイルを書かない。
+    完了条件: 3ファイルが diff で元と同一。ページソースで読み込み順が正しい。
+
+[~] Phase 1.5 head出力（フォント・メタ・favicon）の実装
+    （2026-07-17 header.php実装完了。出力HTML照合はDocker起動後）
+    対象: header.php, functions.php
+    内容: React版 index.html と同一の head 要素を出力する。
+          - lang="ja" / charset / viewport
+          - <title>株式会社アイシン | まだ見ぬピースを発明する</title>（全ページ共通。
+            wp_head より前に固定出力し、title-tag サポートは使わない）
+          - meta description（index.html の文言をそのまま転記）
+          - meta theme-color #FBF7F2
+          - favicon / apple-touch-icon = assets/images/logo-mark.png
+          - Google Fonts preconnect ×2 + Syne:wght@700;800 &
+            Zen+Kaku+Gothic+New:wght@400;500;700;900 & display=swap
+    完了条件: 出力HTMLの該当タグが React版 index.html と一致（wp_head が出す
+              WP標準タグの追加は許容。emoji系スクリプト等の不要出力は削除）。
+
+[~] Phase 1.6 JSライブラリの同梱とenqueue
+    （2026-07-17 配置・enqueue実装完了（gsap 3.15.0/matter 0.20.0）。
+      コンソール確認はDocker起動後）
+    対象: assets/vendor/gsap.min.js, assets/vendor/ScrollTrigger.min.js,
+          assets/vendor/matter.min.js, functions.php
+    内容: gsap@3.12.5 / ScrollTrigger@3.12.5 / matter-js@0.20.0 の min ファイルを
+          /Users/jime0083/aishin/node_modules/（無ければ npm 公式レジストリ）から
+          取得して配置。フッターで enqueue（依存関係: 自作JSはこれらに依存）。
+          matter.js はヒーローがあるページのみ読み込む。
+    完了条件: 各ページのコンソールで gsap.version === "3.12.5"、
+              ヒーローのあるページで Matter が参照できる。
+
+====================================================================
+Phase 2: 共通コンポーネント（ヘッダー・フッター・演出パーツ・共通JS）
+====================================================================
+
+[ ] Phase 2.1 ヘッダーの実装
+    対象: header.php, assets/js/header.js
+    内容: Header.tsx を移植。ナビ = ABOUT(/) / SERVICE / WORKS / CAREER ＋
+          ENTRYボタン。クラス名（header, header__inner, header__logo,
+          header__logo-mark, header__nav, header__link, header__entry,
+          header__burger, header__drawer, header__drawer-link,
+          header__drawer-link--entry）とaria属性を完全一致。
+          JS: scrollY>24 で is-scrolled / バーガーで is-open トグル＋
+          body overflow hidden / ドロワーリンクの transitionDelay を開時
+          80+i*50ms・閉時0msに設定 / リンククリックで閉じる。
+          現在ページのリンクに active クラスを付与（ABOUTはフロントページのみ）。
+    完了条件: PC・モバイル両方でReact版と同じ見た目/挙動（スクロール変化、
+              ドロワー開閉アニメ、active下線）。
+
+[ ] Phase 2.2 フッターの実装
+    対象: footer.php
+    内容: Footer.tsx を移植。container 内に logo-footer.png（リンク=トップ）、
+          リンク5件（ABOUT/SERVICE/WORKS/CAREER/ENTRY）、
+          「© <?php echo date('Y'); ?> Aishin Inc. All Rights Reserved.」。
+          wp_footer 呼び出しもここに置く。
+    完了条件: React版フッターとDOM構造・表示が一致。
+
+[ ] Phase 2.3 パズルパス定数と画像フレーム出力関数
+    対象: inc/puzzle-paths.php, inc/image-frame.php, functions.php(require)
+    内容: puzzleShape.ts の PUZZLE_PATH / PUZZLE_PATH_LEFT を PHP 定数に転記。
+          ImagePlaceholder.tsx と同等の出力関数
+          aishin_image_frame($id, $label, $ratio='4 / 3', $shape=null, $src=null)
+          を実装: IMAGE_SOURCES 相当の ID→assets/images/opt/{ID}.jpg 対応表
+          （22件）を持ち、登録IDは <img loading="lazy" decoding="async">、
+          未登録IDはプレースホルダー枠（×線SVG+ID+ラベル）を出力。
+          shape=puzzle/puzzle-left は外側ラッパー+SVG clipPath（clipId は
+          puzzle-clip-{ID}）、ellipse等は img-ph--{shape} クラス。
+          role="img" aria-label="画像プレースホルダー: {label}" を維持。
+    完了条件: 各shapeの出力HTMLがReact版のレンダリング結果と一致。
+
+[ ] Phase 2.4 WordPiece・GiantWord・Marquee のテンプレートパーツ化
+    対象: template-parts/word-piece.php, template-parts/giant-word.php,
+          template-parts/marquee.php, inc/word-pieces.php
+    内容: WORD_PIECES 11個（MISSION/solid, DX/yellow, PASSION/outline,
+          LOGIC/white, INSIGHT/solid, TEAM/outline, GROWTH/yellow, IDEA/white,
+          VISION/outline, CHANGE/solid, ?/piece）を配列定義し、
+          hero__piece--{variant} + SVG(viewBox="0 0 1 1",
+          preserveAspectRatio="none", vector-effect) で出力。
+          GiantWord: giant-word--{side} + data-giant。
+          Marquee: text（デフォルト 'INVENTING THE MISSING PIECE — AISHIN Inc. — '）
+          を4回リピート×2スパン、reverse/tilt 引数対応。
+    完了条件: 出力HTMLがReact版と一致（ピースのSVGパス文字列含む）。
+
+[ ] Phase 2.5 FloatingBg（浮遊背景）の実装
+    対象: template-parts/floating-bg.php, assets/js/floating-bg.js
+    内容: FloatingBg.tsx の SHAPES 11個（kind/left/top/speed/float）を完全転記して
+          マークアップ出力。JS: reduced-motion時は無効。rAFループで
+          scrollY 変化時のみ各要素を translateY（range = vh+600、
+          y < -300 でループ）。body直下・全ページ共通で出力。
+    完了条件: 全ページでReact版と同じ背景シェイプ・視差挙動。
+
+[ ] Phase 2.6 カスタムカーソルの実装
+    対象: template-parts/cursor.php, assets/js/cursor.js
+    内容: CustomCursor.tsx を移植。(pointer:fine) かつ non-reduced のみ有効化し
+          body に has-custom-cursor。cursor__dot / cursor__ring / cursor__label。
+          mousemoveで表示、mouseoverで a,button,[data-cursor-label] を closest 判定
+          → is-label / is-hover 切替。lerp係数 dot 0.4 / ring 0.16。
+          html の mouseleave で非表示。
+    完了条件: ホバー拡大・DRAGラベル表示までReact版と同挙動。
+
+[ ] Phase 2.7 共通スクロールアニメーションJSの実装
+    対象: assets/js/animations.js
+    内容: useSubpageAnimations.ts + Home.tsx のScrollTrigger群を統合移植。
+          gsap.matchMedia('(prefers-reduced-motion: no-preference)') 内で登録:
+          (1)[data-reveal] y48/0.9s/power3.out/top85%
+          (2)[data-reveal-group] 子要素 y72 scale0.94 rotate±4 stagger0.13/top82%
+          (3).section__title clipPathリビール 1s/power4.out/top86%
+          (4)[data-giant] xPercent 6dir→-10dir scrub0.6
+          (5)skew: body[data-skew-targets] があれば対象に velocity/-400 clamp±6
+          (6)[data-count] 1.6s power2.out（data-decimals）
+          (7).img-ph clipPath inset(0 100% 0 0)→0 1.1s/power4.out/top86%
+          (8).entry__char yPercent60→0 back.out(1.6) stagger0.07 trigger .entry top70%
+          (9)[data-reveal-line] .mission__line-inner yPercent110→0 1s/power4.out
+          DOMContentLoaded後に初期化。
+    完了条件: 各アニメのパラメータがReact版と数値一致し、全ページで動作する。
+
+[ ] Phase 2.8 物理演算ピースJSの実装
+    対象: assets/js/physics-pieces.js
+    内容: usePhysicsPieces.ts / Hero.tsx の物理演算を移植した初期化関数
+          aishinPhysicsPieces(stage, piecesWrap, {startOffset}) を実装。
+          gravity y1.1 / 壁3枚(isStatic, friction0.8) / 剛体は各DOMサイズ計測
+          （chamfer min(h/2-2,26), restitution0.45, friction0.4,
+          frictionAir0.012, angle±0.5, 落下開始 y = -h - i*random(90,180) - offset。
+          offset: トップ200 / 下層160）。
+          MouseConstraint(stiffness0.15, damping0.1)＋wheel/touch系リスナー除去で
+          スクロール非阻害。rAFループでDOMにtransform同期、
+          IntersectionObserverで画面外停止、リサイズで壁再構築＋はみ出し復帰。
+          reduced-motion時は起動しない（CSS側の hero__pieces--static を出力）。
+    完了条件: 落下・ドラッグ・リサイズ・スクロールの挙動がReact版と一致。
+
+====================================================================
+Phase 3: トップページ（front-page.php）
+====================================================================
+
+[ ] Phase 3.1 ローディング演出の実装
+    対象: template-parts/loader.php, assets/js/loader.js
+    内容: Loader.tsx を移植。パネル2枚（orange/paper）、AISHIN 1文字ずつ、
+          loader__mark 回転372°/1.5s、カウンター0→100（1.3s power2.inOut）、
+          1.5s〜パネルワイプ（paper→orange の順、yPercent -100 / 0.7s power4.inOut）。
+          1.55s 時点で document に CustomEvent 'aishin:reveal' を dispatch し、
+          完了後 display:none。reduced-motion時は即非表示＋即reveal発火。
+    完了条件: タイミング・イージング含めReact版のローディングと同一に見える。
+
+[ ] Phase 3.2 LiquidBg（WebGL液体背景）の移植
+    対象: assets/js/liquid-bg.js
+    内容: LiquidBg.tsx を Vanilla JS 化。VERT/FRAG シェーダー文字列・
+          ROW_PHRASES 4行（文言/色/速度）・drawTexture（紙色#fbf7f1、
+          右上グロー、30pxドットグリッド#e7dcca…値はソース転記）・
+          drawTextAtlas（Syne 800、行高256、タイル2周描き）を完全移植。
+          dpr上限1.75 / trail16点(減衰0.955, 距離閾値64) / uScrollX =
+          scrollY*0.25*dpr / document.fonts.ready 後の再描画 /
+          IntersectionObserver停止 / WebGL非対応・reduced時は起動せず
+          CSSフォールバック。canvas.hero__canvas を対象とする。
+    完了条件: トップFVの液体歪み・流れるアウトライン文字・カーソルリップルが
+              React版と同一に動く。
+
+[ ] Phase 3.3 Hero（FV）マークアップとキネティックタイポJS
+    対象: template-parts/hero.php, assets/js/hero.js, front-page.php
+    内容: Hero.tsx を移植。TITLE_LINES「まだ見ぬピースを/発明する」を1文字span化
+          （ピ/ー/ス に hero__char--accent）、hero__lead、hero__sub、
+          回転バッジSVG（badge-circle パス・文言 JOIN OUR TEAM ・ AISHIN INC. ・
+          ENTRY ・）、scroll-cue、stage+WORD_PIECES、Marquee（デフォルト文言）。
+          JS: 'aishin:reveal' イベント受信後にタイムライン開始
+          （chars yPercent130 rotate±26 stagger0.055 → lead → sub → badge
+          (scale0.5 rotate-90) → scroll-cue → タイトル浮遊ループ y-10 2.6s）。
+          物理演算も reveal 後に起動（startOffset 200）。reduced時は即時表示。
+    完了条件: FV全体（出現順・浮遊・ピース落下・バッジ・DRAGカーソル）が
+              React版と一致。
+
+[ ] Phase 3.4 Mission / About セクションの実装
+    対象: template-parts/section-mission.php, template-parts/section-about.php
+    内容: Mission.tsx / About.tsx を移植。ミッション2行のマスク構造
+          （mission__line > mission__line-inner, data-reveal-line）、本文2段落。
+          About: STATS 4件（2018設立/48名/28.4歳/120+、data-count・data-decimals）、
+          見出し「若さは、武器だ。」、IMG-01(4/3)・IMG-02(4/5)、
+          COMPANY PROFILE 7行（社名〜メンバー数）を dl で出力。
+          GiantWord: MISSION(right) / ABOUT(left)。eyebrow番号 01 / 02。
+    完了条件: 文言・数値・構造がReact版と完全一致し、カウントアップが動く。
+
+[ ] Phase 3.5 WorksTeaser / InterviewTeaser セクションの実装
+    対象: template-parts/section-works-teaser.php,
+          template-parts/section-interview-teaser.php
+    内容: WorksTeaser.tsx: 実績3件（MANUFACTURING/RETAIL/STARTUPの文言転記、
+          IMG-W01〜03、リンクは /works/）、見出し「成果で語る。実績の一部。」、
+          VIEW MORE WORKS ボタン。eyebrow 03、GiantWord WORKS(left)。
+          InterviewTeaser.tsx: CPT interview をスラッグ昇順で3件クエリし、
+          quote/name/position・入社年/portrait でカード出力（リンク /interview/{slug}/）。
+          見出し「ピースを発明する人たち。」、eyebrow 04、GiantWord PEOPLE(right)、
+          section--tinted。CPT未投入時も枠が崩れないこと（シードは Phase 4.4）。
+    完了条件: React版トップの両セクションと表示一致（インタビューはシード後に確認）。
+
+[ ] Phase 3.6 CareerTeaser / EntryCta セクションと front-page.php 組み立て
+    対象: template-parts/section-career-teaser.php,
+          template-parts/section-entry-cta.php, front-page.php
+    内容: CareerTeaser.tsx: SUPPORTS 3件（メンター制度/アイシン・アカデミー/
+          発明評価制度）、IMG-12(4/5)、VIEW CAREER SUPPORT→/career/、eyebrow 05、
+          GiantWord GROWTH(left)。
+          EntryCta.tsx: entry__bg、ENTRY 5文字 span、コピー2行、
+          ENTRY FORM→/entry/。
+          front-page.php: Loader→Hero→Mission→About→WorksTeaser→InterviewTeaser
+          →CareerTeaser→Marquee('JOIN US — INVENT YOUR OWN PIECE — ', reverse, tilt)
+          →EntryCta の順に組み立て、body に
+          data-skew-targets=".mission__statement, .works__cards,
+          .interview__cards, .career__list" を付与。トップ専用JS
+          （loader/liquid-bg/hero/matter）のenqueue条件を is_front_page() に設定。
+    完了条件: トップページ全体がReact版と一致（スクロール通し確認）。
+
+====================================================================
+Phase 4: インタビュー（カスタム投稿タイプ + ACF）
+====================================================================
+
+[ ] Phase 4.1 ACF導入とCPT登録
+    対象: inc/cpt-interview.php, functions.php, docker環境（ACFインストール）
+    内容: WP-CLI（docker compose exec）で advanced-custom-fields を
+          インストール・有効化。CPT 'interview' を登録:
+          public true / has_archive false / rewrite ['slug'=>'interview'] /
+          supports ['title'] / menu_icon 'dashicons-groups' /
+          ラベル日本語「社員インタビュー」。パーマリンク構造 /%postname%/ を設定。
+    完了条件: 管理画面に「社員インタビュー」メニューが出現し、
+              /interview/{slug}/ でアクセスできる（テンプレは Phase 4.3）。
+
+[ ] Phase 4.2 ACFフィールドのPHP定義
+    対象: inc/acf-fields-interview.php
+    内容: acf_add_local_field_group で interview 用フィールドを定義
+          （requirements.md 6.2 の一覧どおり）:
+          name, name_en, join_year, position, quote, career(textarea),
+          portrait_image(画像/ID返却), portrait_label,
+          qa1_heading, qa1_body(textarea・空行区切りで段落), qa1_photo(任意),
+          qa1_photo_label, qa2_*, qa3_*。管理画面での表示順・説明文も設定。
+    完了条件: インタビュー編集画面に全フィールドが表示され保存できる。
+
+[ ] Phase 4.3 single-interview.php テンプレートの実装
+    対象: single-interview.php, assets/js/interview.js
+    内容: InterviewDetail.tsx を移植。
+          - itv-hero: GiantWord INTERVIEW(right)、物理演算ステージ（WORD_PIECES、
+            startOffset160）、ポートレート（ratio 3/4, shape ellipse）、
+            eyebrow「INTERVIEW {slug}」、quote 1文字ずつ itv-hero__char、
+            name+nameEn、position/入社年
+          - プロフィール dl（氏名/入社/役職/経歴、section--tinted）
+          - Q&A 3本ループ: eyebrow「0N QUESTION」、見出し、本文段落
+            （qaN_body を空行で分割し<p>群に）、写真は奇数番目(i%2===1)で
+            itv-qa__media--first、写真なしは itv-qa__grid--single
+          - ほかの社員も知る。: 自分以外の2名をカード表示（section--tinted、
+            GiantWord PEOPLE(left)）
+          - Marquee('MEET YOUR FUTURE TEAM — ', reverse, tilt) → EntryCta
+          JS: quoteのキネティック出現（eyebrow→chars stagger0.028→name/role）、
+          body data-skew-targets=".itv-qa__body"。
+    完了条件: 3名分すべてでReact版 /interview/01〜03 と表示・アニメが一致。
+
+[ ] Phase 4.4 インタビュー初期データのシードスクリプト
+    対象: seed/seed-interviews.php（WP-CLI eval-file 用）, README.md に実行手順
+    内容: interviews.ts の3名分データを全文転記し、以下を自動実行:
+          (1) IMG-09/10/11, IMG-I01〜I06 をメディアライブラリへ登録
+          (2) interview 投稿3件をスラッグ 01/02/03 で作成（タイトル=氏名）
+          (3) 全ACFフィールドへ値を設定（qa本文は段落間を空行にして格納）
+          再実行しても重複作成されない冪等性を持たせる。
+    完了条件: スクリプト実行後、トップのInterviewTeaserと詳細3ページに
+              React版と同一の内容が表示される。
+
+====================================================================
+Phase 5: 下層固定ページ
+====================================================================
+
+[ ] Phase 5.1 PageHero（下層共通ヒーロー）の実装
+    対象: template-parts/page-hero.php, assets/js/page-hero.js
+    内容: PageHero.tsx を移植。GiantWord(title, right)、物理演算ステージ
+          （WORD_PIECES, startOffset160）、eyebrow「AISHIN INC. — RECRUIT SITE」、
+          タイトル1文字ずつ page-hero__char（スペースは&nbsp;）。
+          JS: ページ読込後 eyebrow→chars(yPercent130 rotate±26 stagger0.06)
+          →浮遊ループ(y-8 2.6s)。titleJa/lead 引数対応（現状未使用だが仕様維持）。
+    完了条件: SERVICE/WORKS/CAREER/ENTRY のヒーローがReact版と一致。
+
+[ ] Phase 5.2 SERVICEページの実装
+    対象: page-service.php
+    内容: Service.tsx を移植。svc-intro（「発明は、3つの現場で起こる。」+本文）、
+          SERVICES 3件（Strategy Consulting / DX Acceleration / New Business
+          Design — lead・challenges3・offers3・steps4・IMG-S01〜03・
+          GiantWord STRATEGY/DX/CREATE を全文転記）。奇数番目は
+          section--tinted + svc__grid--flip + GiantWord left。
+          id="service-01" 等のアンカー、svc__num、svc__point-num「01-1」形式、
+          STEP N 表記まで一致させる。末尾 Marquee("LET'S INVENT THE MISSING
+          PIECE — ", reverse, tilt) + EntryCta。
+          body data-skew-targets=".svc__points, .svc__steps"。
+    完了条件: React版 /service と全文・構造・アニメが一致。
+
+[ ] Phase 5.3 WORKSページの実装
+    対象: page-works.php
+    内容: Works.tsx を移植。svc-intro（「成果で語る、挑戦の記録。」+本文）、
+          WORKS 5件（製造/小売/スタートアップ/医療/物流 — titleLines の改行位置、
+          課題/支援内容/成果、stat の prefix/value/decimals/suffix/label、
+          IMG-W01〜05、GiantWordタグ名を全文転記）。flipルール・tintedルールは
+          SERVICEと同じ。stat は data-count/data-decimals でカウントアップ。
+          末尾 Marquee('YOUR PIECE COMES NEXT — ', reverse, tilt) + EntryCta。
+          body data-skew-targets=".wrk__rows"。
+    完了条件: React版 /works と全文・構造・カウントアップが一致。
+
+[ ] Phase 5.4 CAREERページの実装
+    対象: page-career.php
+    内容: Career.tsx を移植。svc-intro（「成長に、終わりはないから。」+本文）、
+          CAREER_ITEMS 4件（見出しの改行位置含め全文転記。01-02は画像左
+          IMG-C01、03-04は画像右 IMG-C02 + section--tinted + flip +
+          GiantWord GROWTH(left)）、BENEFITS 10件グリッド
+          （「挑戦を支える、10の制度。」GiantWord SUPPORT(right)）。
+          末尾 Marquee('GROW BEYOND YOUR LIMIT — ', reverse, tilt) + EntryCta。
+          body data-skew-targets=".crr__benefits"。
+    完了条件: React版 /career と全文・構造が一致。
+
+[ ] Phase 5.5 ENTRYページ（ダミーフォーム）の実装
+    対象: page-entry.php, assets/js/entry-form.js
+    内容: Entry.tsx を移植。PageHero(ENTRY)、GiantWord JOIN US(right)、
+          リード文・注意書き、フォーム7項目（select: ENTRY_TYPES 5択 /
+          SOURCES 6択、input: name/affiliation/phone/email、textarea rows=7。
+          placeholder・autocomplete・「必須」バッジまで転記）、
+          個人情報の取り扱い6項目、同意チェック、送信ボタン
+          「同意して送信する →」+ 非活性時の注意文。
+          JS: blur で touched 管理、バリデーション（空=「入力してください」/
+          select「選択してください」/ email正規表現 / phone 10〜11桁）、
+          エラー文言は ent__error で表示、全て有効+同意で送信ボタン活性。
+          submit → preventDefault → done画面（「このポートフォリオサイトからは
+          送信できません。」+ BACK TO TOP）に差し替え + scrollTo(0,0)。
+          実送信は行わない（送信処理は1関数に集約し将来接続可能に）。
+    完了条件: React版 /entry とフォーム挙動（エラー表示・活性制御・done画面）
+              が完全一致。
+
+[ ] Phase 5.6 404ページの実装
+    対象: 404.php
+    内容: ComingSoon.tsx を移植（title「NOT FOUND」/ jp「ページが見つかりません」/
+          「このページは現在準備中です。」/ ← BACK TO TOP）。
+    完了条件: 存在しないURLでReact版の NOT FOUND 表示と一致。
+
+[ ] Phase 5.7 固定ページ・表示設定のセットアップスクリプト
+    対象: seed/seed-pages.php, README.md
+    内容: WP-CLI で固定ページ service / works / career / entry を作成し
+          各テンプレートを割当、フロントページ表示用の空ページ作成+
+          「ホームページの表示」を固定ページに設定、パーマリンク /%postname%/、
+          サイトタイトル「株式会社アイシン」、キャッチフレーズ空、
+          不要なデフォルトコンテンツ（Hello World / サンプルページ）削除。
+          冪等に実行できること。
+    完了条件: スクリプト1回の実行で全URL（/ /service/ /works/ /career/
+              /entry/ /interview/01/）が正しいテンプレートで表示される。
+
+====================================================================
+Phase 6: デザイン完全一致の検証
+====================================================================
+
+[ ] Phase 6.1 React版リファレンス環境の起動確認
+    対象: （作業手順のみ）
+    内容: /Users/jime0083/aishin で npm install（未実施なら）→ npm run dev を起動し、
+          照合用リファレンスとする（もしくは dist/ を静的サーブ）。
+    完了条件: React版が http://localhost:5173 等で全ページ閲覧できる。
+
+[ ] Phase 6.2 スクリーンショット比較（全ページ×2幅）
+    対象: tests/compare-screenshots.md（結果記録）
+    内容: Playwright等で React版 / WP版 の両方を 1440px と 390px（≤900の代表幅）で
+          全7ページ（トップ・service・works・career・entry・interview01〜03の代表+
+          404）を、アニメーション完了状態（reduced-motion指定 or 待機後）で撮影し
+          並べて比較。差異は problem.txt に P番号で記録。
+    完了条件: 全ページ・全幅で目視差異ゼロ（画像枠・余白・フォント・改行位置含む）。
+
+[ ] Phase 6.3 インタラクション検証チェックリストの実施
+    対象: tests/interaction-checklist.md
+    内容: 以下をReact版と並べて確認し、チェックリストとして記録:
+          ローダー演出 / ヒーロー文字出現 / ピース落下・ドラッグ / WebGL液体背景
+          （揺らぎ・カーソルリップル・流れる文字）/ カスタムカーソル（ホバー拡大・
+          DRAGラベル）/ マーキー（通常・reverse・tilt）/ data-reveal系全種 /
+          カウントアップ / skew演出 / ヘッダー is-scrolled・ドロワー /
+          フォームバリデーション全パターン / 404 / prefers-reduced-motion時の
+          静的表示 / コンソールエラーなし。
+    完了条件: 全項目パス。差異は problem.txt 記録→修正→再確認済み。
+
+[ ] Phase 6.4 パフォーマンス・仕上げ確認
+    対象: （確認と微修正）
+    内容: Lighthouse（Performance/Best Practices）を実行し、React版と大きく
+          劣らないことを確認。不要なWP標準出力（emoji script等）の除去漏れ、
+          画像のlazy指定、JS読み込み条件（ページ別enqueue）を最終確認。
+    完了条件: コンソールエラー0・明らかな速度劣化なし。
+
+====================================================================
+Phase 7: AWS公開準備（AI作業分。実操作は manual-work.txt 参照）
+====================================================================
+
+[ ] Phase 7.1 AWSデプロイ詳細手順書の作成
+    対象: docs/aws-deploy-guide.md
+    内容: AWS未経験者向けに以下を画面操作レベルで解説する手順書を作成:
+          (1) AWS/Lightsailの概念とWordPressホスティングの仕組み
+          (2) アカウント作成とセキュリティ設定（MFA・請求アラート）
+          (3) Lightsail WordPressインスタンス作成（東京・$5プラン・Bitnami）
+          (4) 静的IP・SSH接続・初期パスワード取得
+          (5) 格安ドメイン取得（Cloudflare Registrar / お名前.com等の比較と推奨）
+          とDNS Aレコード設定
+          (6) bncert-tool によるHTTPS化（Let's Encrypt・自動更新）
+          (7) セキュリティ強化（管理者PW・ログイン試行制限・自動更新・
+          自動スナップショット）
+          (8) 費用まとめ（月額・年額）とトラブルシューティング
+    完了条件: manual-work.txt の各Workがこの手順書だけで実行できる。
+
+[ ] Phase 7.2 本番移行パッケージの作成
+    対象: docs/deploy-package.md, （テーマzip生成コマンド）
+    内容: テーマの本番反映手順を確立:
+          (1) テーマフォルダのzip化コマンドと管理画面アップロード手順
+          (2) ACFプラグイン導入手順
+          (3) seed/seed-pages.php・seed-interviews.php を本番のWP-CLI
+          （Bitnami環境のwpコマンドパス）で実行する手順
+          (4) 画像パス・URL差異の確認ポイント
+    完了条件: ローカル→本番の移行がドキュメントどおり再現可能。
+
+[ ] Phase 7.3 本番検証チェックリストの作成
+    対象: docs/production-checklist.md
+    内容: 本番URL上で Phase 6.2/6.3 相当の確認を行うためのチェックリスト
+          （HTTPS証明書・全ページ表示・アニメーション・フォーム・
+          モバイル実機・OGP/favicon・管理画面ログイン保護）を作成。
+    完了条件: ユーザーが本番確認に使える状態。
+
+====================================================================
+更新履歴
+====================================================================
+2026-07-17: 初版作成（要件定義・全タスク切り出し完了）

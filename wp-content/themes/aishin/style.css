@@ -1,0 +1,18 @@
+/*
+Theme Name: aishin
+Theme URI: https://github.com/jime0083/aishin-wordpress
+Author: Aishin Inc.
+Description: 株式会社アイシン コーポレートサイト。React SPA版（https://jime0083.github.io/aishin/）と完全同一デザインのWordPressテーマ。
+Version: 0.1.0
+Requires at least: 6.0
+Requires PHP: 8.0
+License: Proprietary
+Text Domain: aishin
+*/
+
+/*
+  このファイルはテーマ情報の宣言のみに使用する。
+  スタイルは assets/css/（global.css → home.css → subpage.css）に
+  React版から無改変で移植したものを読み込む（CLAUDE.md ルール2）。
+  ここにCSSを書いてはならない。
+*/

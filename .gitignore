@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Node（使用する場合）
+node_modules/
+
+# WordPress本体はコンテナ内ボリュームのためリポジトリには含めない
+# （リポジトリ管理対象は wp-content/themes/aishin と seed/ のみ）
+
+# 環境ファイル・秘密情報
+.env
+*.local.php
+
+# ログ・一時ファイル
+*.log
+tmp/
