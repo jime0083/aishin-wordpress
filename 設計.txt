@@ -1,0 +1,370 @@
+====================================================================
+設計.txt — ファーストビュー「パズルピース落下アニメーション」の実装解説
+====================================================================
+対象読者: JavaScript初心者〜中級者
+参照ファイル:
+  React版      : /Users/jime0083/aishin/src/components/WordPiece.tsx
+                 /Users/jime0083/aishin/src/components/puzzleShape.ts
+                 /Users/jime0083/aishin/src/hooks/usePhysicsPieces.ts
+                 /Users/jime0083/aishin/src/sections/Hero.tsx
+  WordPress版  : wp-content/themes/aishin/inc/word-pieces.php
+                 wp-content/themes/aishin/inc/puzzle-paths.php
+                 wp-content/themes/aishin/assets/js/physics-pieces.js
+                 wp-content/themes/aishin/assets/js/hero.js（トップ）
+                 wp-content/themes/aishin/assets/js/page-hero.js（下層）
+
+====================================================================
+1. 全体像 — 「物理エンジン」と「見た目」の分業
+====================================================================
+
+このアニメーションは、大きく分けて2つの世界の組み合わせでできています。
+
+  ┌─────────────────────────────────────────────┐
+  │ 見た目の世界（HTML/CSS/SVG）                  │
+  │  「MISSION」「DX」などの文字が入った           │
+  │  パズルピース型のdiv要素が11個ある            │
+  └─────────────────────────────────────────────┘
+                    ↑
+        毎フレーム位置と角度を同期（transform）
+                    ↓
+  ┌─────────────────────────────────────────────┐
+  │ 物理の世界（matter-js = 物理演算ライブラリ）   │
+  │  画面には見えない「剛体（四角いブロック）」が   │
+  │  重力で落下し、床や壁にぶつかり、転がる        │
+  └─────────────────────────────────────────────┘
+
+ポイント: **物理エンジンは計算だけ**を行い、描画は一切しません。
+毎フレーム「剛体が今どこにあるか（座標と回転角）」を読み取り、
+その値をHTML要素のCSS transform に書き写すことで、
+「本物の物理法則で落ちてくるように見えるDOM要素」が実現できます。
+
+使用ライブラリ:
+  - matter-js 0.20.0 …… 2D物理エンジン（重力・衝突・ドラッグ）
+  - GSAP 3.15.0 ………… 乱数ユーティリティ（gsap.utils.random）に使用
+
+====================================================================
+2. Step 1: パズルピースの「見た目」を作る（HTML + SVG）
+====================================================================
+
+まず、落ちてくるピース1個のHTMLはこういう構造です:
+
+  <div class="hero__piece hero__piece--solid">
+    <svg class="hero__piece-svg" viewBox="0 0 1 1" preserveAspectRatio="none">
+      <path d="M 0.05 0.16 H 0.35 A 0.08 0.107 ..." />   ← パズル型の輪郭
+    </svg>
+    <span class="hero__piece-text">MISSION</span>          ← 中の文字
+  </div>
+
+■ パズル型はどう描いているか（SVGパス）
+
+パズルピースの形は、画像ではなく **SVGの<path>1本** で描いています。
+パスは「0〜1の正規化座標」で定義されているのがミソです。
+
+  viewBox="0 0 1 1"  →  この四角の中を「横1・縦1」の世界として描く
+  preserveAspectRatio="none"  →  外側のdivのサイズに合わせて自由に伸縮
+
+つまり「どんなサイズのピースでも同じパスが使い回せる」設計です。
+パスの中身（puzzle-paths.php / puzzleShape.ts）は:
+
+  M 0.05 0.16          … 左上からスタート
+  H 0.35               … 上辺を右へ直線
+  A 0.08 0.107 0 1 0 … … 円弧で「凸タブ（出っぱり）」を描く
+  H 0.8                … 残りの上辺
+  （以下、右辺に凸タブ、下辺・左辺に凹ノッチ…と一周してZで閉じる）
+
+  ※ A（円弧コマンド）の使い方:
+    A rx ry 回転 大円弧フラグ 掃引方向 終点x 終点y
+    「半円をどちら側に膨らませるか」を掃引方向(0/1)で切り替えることで、
+    同じ書き方で凸（タブ）にも凹（ノッチ）にもできる。
+
+■ 11個のピース
+
+ピースは以下の配列で定義され、全ページで共通です（word-pieces.php）:
+
+  MISSION(solid) / DX(yellow) / PASSION(outline) / LOGIC(white) /
+  INSIGHT(solid) / TEAM(outline) / GROWTH(yellow) / IDEA(white) /
+  VISION(outline) / CHANGE(solid) / ?(piece)
+
+  ※ かっこ内は配色バリエーション。CSSの hero__piece--solid などの
+    修飾クラスで塗り・枠線・文字色を変えている。
+
+■ 置き場所（ステージ）
+
+ピースたちは「ステージ」と呼ぶ枠の中に置きます:
+
+  <div class="hero__stage" data-cursor-label="DRAG">   ← 物理世界の範囲
+    <div class="hero__pieces">                          ← ピースの入れ物
+      <div class="hero__piece">…</div> ×11個
+    </div>
+  </div>
+
+CSSで各ピースは position:absolute にしてあり、後述のJSが
+transform で自由に動かせる状態になっています。
+
+====================================================================
+3. Step 2: 物理の世界を作る（matter-js）
+====================================================================
+
+physics-pieces.js の中身を順番に見ていきます。
+
+--------------------------------------------------------------------
+3-1. エンジン（世界）を作る
+--------------------------------------------------------------------
+
+  const engine = Engine.create({ gravity: { x: 0, y: 1.1 } });
+
+  - gravity.y = 1.1 → 下向きの重力。1.0が標準なので「少し強め」。
+    数字を大きくすると速く落ち、小さくするとフワッと落ちる。
+
+--------------------------------------------------------------------
+3-2. 床と左右の壁を置く（見えない）
+--------------------------------------------------------------------
+
+ピースが画面外に落ちていかないよう、ステージの下端に「床」、
+左右に「壁」を置きます。これらは isStatic: true（動かない剛体）。
+
+  const floor = Bodies.rectangle(width/2, height+60, width*2, 120, wallOpts);
+  const wallL = Bodies.rectangle(-60,     height/2,  120, height*4, wallOpts);
+  const wallR = Bodies.rectangle(width+60, height/2, 120, height*4, wallOpts);
+
+  ※ Bodies.rectangle(中心x, 中心y, 幅, 高さ, オプション)
+  ※ 床はステージ下端より60px下に置いた厚さ120pxの板。
+    「ステージの底=床の上面」になる位置計算。
+
+--------------------------------------------------------------------
+3-3. ピース1個ずつに「剛体」を作る
+--------------------------------------------------------------------
+
+ここが最重要ポイント。**DOM要素の実際のサイズを測って**、
+同じ大きさの物理ブロックを作ります。
+
+  const bodies = elements.map((el, i) => {
+    const w = el.offsetWidth;    // DOMの実寸を測る
+    const h = el.offsetHeight;
+    const x = random(w, width - w);              // 横位置はランダム
+    const y = -h - i * random(90, 180) - 200;    // 画面の上の外に配置
+    return Bodies.rectangle(x, y, w, h, {
+      chamfer: { radius: Math.min(h/2 - 2, 26) },  // 角を丸める
+      restitution: 0.45,   // 反発係数（跳ね返り具合。0=跳ねない 1=完全に跳ねる）
+      friction: 0.4,       // 摩擦（滑りにくさ）
+      frictionAir: 0.012,  // 空気抵抗（落下速度の頭打ち）
+      angle: random(-0.5, 0.5),  // 最初から少し傾けておく（自然に見える）
+    });
+  });
+
+  重要な工夫:
+  (a) 開始位置 y は「-h - i * random(90,180) - 200」
+      → i（ピースの番号）が大きいほど高い位置からスタート
+      → 結果、**1個ずつ時間差でパラパラ落ちてくる**ように見える。
+        タイマーは使わず「開始高度の差」だけで時間差を作っている。
+  (b) 剛体は「パズル型」ではなく「角丸の四角」
+      → 凹凸の完全な物理衝突は計算が重く、見た目上も差が分からない。
+        角丸四角で十分自然。パフォーマンスと見た目のバランスの取り方。
+
+--------------------------------------------------------------------
+3-4. マウスでドラッグできるようにする
+--------------------------------------------------------------------
+
+  const mouse = Mouse.create(stage);
+  const mouseConstraint = MouseConstraint.create(engine, {
+    mouse,
+    constraint: { stiffness: 0.15, damping: 0.1 },
+  });
+
+  - MouseConstraint = 「マウスと剛体をバネでつなぐ」仕組み。
+    stiffness（バネの硬さ）0.15なので、掴むとビヨンと追従する。
+
+  ★落とし穴と対策★
+  matter-jsのMouseは標準でホイール・タッチイベントも乗っ取るため、
+  そのままだと**ステージ上でページスクロールができなくなる**。
+  そこで不要なリスナーを外す:
+
+    stage.removeEventListener('wheel',      mouse.mousewheel);
+    stage.removeEventListener('touchmove',  mouse.mousemove);
+    stage.removeEventListener('touchstart', mouse.mousedown);
+    stage.removeEventListener('touchend',   mouse.mouseup);
+
+  → PCではドラッグ可能・スクロールも可能、
+    スマホではスクロール操作を邪魔しない、が両立できる。
+
+====================================================================
+4. Step 3: 物理世界とDOMを毎フレーム同期する
+====================================================================
+
+requestAnimationFrame（rAF）で毎フレーム（約60回/秒）ループを回します。
+
+  const tick = (time) => {
+    const delta = Math.min(time - lastTime, 33.33);  // 前フレームからの経過ms
+    lastTime = time;
+    if (visible) {
+      Engine.update(engine, delta);        // ← 物理世界を delta ms ぶん進める
+      for (let i = 0; i < bodies.length; i++) {
+        const b = bodies[i];               // 剛体（物理世界の座標を持つ）
+        const el = elements[i];            // 対応するDOM要素
+        el.style.transform =
+          `translate(${b.position.x - w/2}px, ${b.position.y - h/2}px)
+           rotate(${b.angle}rad)`;         // ← 位置と回転を書き写す
+      }
+    }
+    requestAnimationFrame(tick);
+  };
+
+  ポイント:
+  (a) matter-jsの座標は「剛体の中心」、CSSのtranslateは「要素の左上」
+      基準なので、w/2・h/2 を引いて変換している。
+  (b) delta を 33.33ms（30fps相当）で頭打ちにしている
+      → タブが一瞬固まった後に物理が「ワープ」して壁を突き抜ける事故を防ぐ。
+  (c) transform を使う理由: top/left の変更はブラウザの再レイアウトを
+      起こすが、transform はGPU合成だけで済むので滑らか。
+
+■ 画面外では止める（省エネ）
+
+  const observer = new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting;
+  });
+  observer.observe(stage);
+
+  ステージが画面外にスクロールされたら visible=false になり、
+  物理計算とDOM更新をスキップ。CPU/バッテリーを節約する。
+
+■ リサイズ対応
+
+  ウィンドウサイズが変わったら床と壁を作り直し、
+  新しい幅の外にはみ出したピースは上から降らせ直す。
+
+====================================================================
+5. Step 4: 開始タイミングとアクセシビリティ
+====================================================================
+
+■ トップページ: ローディング演出が明けてから落とす
+
+  トップにはローディング画面（AISHIN + カウンター）があるため、
+  ローダーが「ワイプで開く瞬間」にカスタムイベントを発火し、
+  それを合図に物理演算を開始する:
+
+    loader.js  → document.dispatchEvent(new CustomEvent('aishin:reveal'))
+    hero.js    → document.addEventListener('aishin:reveal', start)
+                 start()内で aishinPhysicsPieces(stage, pieces, {startOffset: 200})
+
+  下層ページはローダーがないので、ページ読み込み後すぐ開始
+  （page-hero.js / interview.js。startOffset は 160）。
+
+  ※ startOffset = 落下開始高度の底上げ量。トップは演出が長いぶん
+    少し高い位置(200)から、下層は160から。React版の数値をそのまま踏襲。
+
+■ 「動きを減らす」設定のユーザーへの配慮
+
+  OSで「視差効果を減らす」を設定しているユーザーには
+  激しいアニメーションを見せないのがマナー（酔い・発作対策）:
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  物理演算を起動せず、代わりにCSSクラス hero__pieces--static を付けて
+  ピースを静的に並べて表示する。
+
+====================================================================
+6. React版とWordPress版の違い
+====================================================================
+
+ロジックは完全に同一で、「入れ物」だけが違います。
+
+  | 項目           | React版                     | WordPress版                  |
+  |----------------|-----------------------------|------------------------------|
+  | ピースのHTML    | WordPiece.tsx（JSX）        | inc/word-pieces.php（PHP）   |
+  | パズルのパス    | puzzleShape.ts（TS定数）    | inc/puzzle-paths.php（定数） |
+  | 物理演算       | usePhysicsPieces.ts（hook） | physics-pieces.js（関数）    |
+  | 起動タイミング  | useEffectでマウント時       | DOMContentLoaded/revealイベント|
+  | 後片付け       | アンマウント時にエンジン破棄 | 不要（ページ遷移=全リロード）  |
+
+  Reactはページ遷移してもJSが生き続けるSPA なので、ページを離れる際に
+  エンジンやイベントリスナーを破棄する「クリーンアップ処理」が必要でした。
+  WordPress版はページ遷移のたびに全部作り直される（MPA）ため、
+  クリーンアップが不要になり、むしろシンプルになっています。
+
+====================================================================
+7. 初心者向け: 最小構成で自分で作ってみる
+====================================================================
+
+以下をhtmlファイル1枚に貼れば、最小版の「落ちてくるブロック」が動きます。
+これを理解してから本実装を読むと全体が掴めます。
+
+  <!doctype html>
+  <div id="stage" style="position:relative; width:100%; height:400px;
+       overflow:hidden; background:#fbf7f1;">
+    <div class="piece" style="position:absolute; width:120px; height:60px;
+         background:#ff5a1f; border-radius:16px; color:#fff;
+         display:grid; place-items:center;">HELLO</div>
+    <div class="piece" style="position:absolute; width:100px; height:60px;
+         background:#26221d; border-radius:16px; color:#fff;
+         display:grid; place-items:center;">WORLD</div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+  <script>
+    const { Engine, Bodies, Composite, Mouse, MouseConstraint } = Matter;
+    const stage = document.getElementById('stage');
+    const els = [...stage.querySelectorAll('.piece')];
+
+    // 1. 世界を作る
+    const engine = Engine.create({ gravity: { x: 0, y: 1.1 } });
+    const W = stage.clientWidth, H = stage.clientHeight;
+
+    // 2. 床と壁
+    Composite.add(engine.world, [
+      Bodies.rectangle(W/2, H+60, W*2, 120, { isStatic: true }),
+      Bodies.rectangle(-60, H/2, 120, H*4, { isStatic: true }),
+      Bodies.rectangle(W+60, H/2, 120, H*4, { isStatic: true }),
+    ]);
+
+    // 3. DOMのサイズで剛体を作る（時間差で上から）
+    const bodies = els.map((el, i) => Bodies.rectangle(
+      100 + Math.random() * (W - 200),          // x: ランダム
+      -60 - i * 150,                            // y: 番号ぶん高く
+      el.offsetWidth, el.offsetHeight,
+      { restitution: 0.45, angle: Math.random() - 0.5 }
+    ));
+    Composite.add(engine.world, bodies);
+
+    // 4. ドラッグ
+    Composite.add(engine.world,
+      MouseConstraint.create(engine, { mouse: Mouse.create(stage) }));
+
+    // 5. 毎フレーム: 物理→DOMへ書き写す
+    let last = performance.now();
+    (function tick(t) {
+      Engine.update(engine, Math.min(t - last, 33.33)); last = t;
+      bodies.forEach((b, i) => {
+        const el = els[i];
+        el.style.transform = `translate(
+          ${b.position.x - el.offsetWidth/2}px,
+          ${b.position.y - el.offsetHeight/2}px) rotate(${b.angle}rad)`;
+      });
+      requestAnimationFrame(tick);
+    })(last);
+  </script>
+
+ここから本実装に足されているのは:
+  ① 四角 → SVGパズル型（見た目だけの差し替え）
+  ② スクロールを邪魔しないためのリスナー除去
+  ③ 画面外での停止（IntersectionObserver）
+  ④ リサイズ対応
+  ⑤ reduced-motion対応
+  ⑥ ローダーと連動した開始タイミング制御
+の6点だけです。
+
+====================================================================
+8. パラメータ調整早見表（挙動を変えたくなったら）
+====================================================================
+
+  | 変えたい挙動             | パラメータ                  | 現在値   |
+  |--------------------------|----------------------------|----------|
+  | 落ちる速さ               | engine の gravity.y        | 1.1      |
+  | 跳ね返り具合             | restitution                | 0.45     |
+  | 落下の時間差             | y計算の random(90, 180)    | 90〜180  |
+  | ドラッグの「バネ感」      | constraint.stiffness       | 0.15     |
+  | 滑りやすさ               | friction                   | 0.4      |
+  | ふわっと感（空気抵抗）    | frictionAir                | 0.012    |
+  | 初期の傾き               | angle: random(-0.5, 0.5)   | ±0.5rad  |
+
+  ※ ただし本プロジェクトは「React版とのデザイン完全一致」が絶対条件のため、
+    これらの値を変更してはならない（CLAUDE.md ルール2）。
+    この表は仕組みの理解と将来の別プロジェクトでの応用のための参考情報。
