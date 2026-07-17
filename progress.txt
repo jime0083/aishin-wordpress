@@ -274,7 +274,9 @@ Phase 3: トップページ（front-page.php）
 Phase 4: インタビュー（カスタム投稿タイプ + ACF）
 ====================================================================
 
-[ ] Phase 4.1 ACF導入とCPT登録
+[~] Phase 4.1 ACF導入とCPT登録
+    （2026-07-17 CPT登録・ヘルパー実装完了。ACFインストール・有効化と
+      パーマリンク設定はDocker導入後に実施）
     対象: inc/cpt-interview.php, functions.php, docker環境（ACFインストール）
     内容: WP-CLI（docker compose exec）で advanced-custom-fields を
           インストール・有効化。CPT 'interview' を登録:
@@ -284,7 +286,8 @@ Phase 4: インタビュー（カスタム投稿タイプ + ACF）
     完了条件: 管理画面に「社員インタビュー」メニューが出現し、
               /interview/{slug}/ でアクセスできる（テンプレは Phase 4.3）。
 
-[ ] Phase 4.2 ACFフィールドのPHP定義
+[~] Phase 4.2 ACFフィールドのPHP定義（2026-07-17 実装完了。teaser_role
+      フィールドを追加（トップカード用肩書・要件定義書6.2の補足））
     対象: inc/acf-fields-interview.php
     内容: acf_add_local_field_group で interview 用フィールドを定義
           （requirements.md 6.2 の一覧どおり）:
@@ -294,7 +297,7 @@ Phase 4: インタビュー（カスタム投稿タイプ + ACF）
           qa1_photo_label, qa2_*, qa3_*。管理画面での表示順・説明文も設定。
     完了条件: インタビュー編集画面に全フィールドが表示され保存できる。
 
-[ ] Phase 4.3 single-interview.php テンプレートの実装
+[~] Phase 4.3 single-interview.php テンプレートの実装（2026-07-17 実装完了）
     対象: single-interview.php, assets/js/interview.js
     内容: InterviewDetail.tsx を移植。
           - itv-hero: GiantWord INTERVIEW(right)、物理演算ステージ（WORD_PIECES、
@@ -312,7 +315,8 @@ Phase 4: インタビュー（カスタム投稿タイプ + ACF）
           body data-skew-targets=".itv-qa__body"。
     完了条件: 3名分すべてでReact版 /interview/01〜03 と表示・アニメが一致。
 
-[ ] Phase 4.4 インタビュー初期データのシードスクリプト
+[~] Phase 4.4 インタビュー初期データのシードスクリプト
+    （2026-07-17 実装完了（interviews.ts全文転記・冪等）。実行はDocker導入後）
     対象: seed/seed-interviews.php（WP-CLI eval-file 用）, README.md に実行手順
     内容: interviews.ts の3名分データを全文転記し、以下を自動実行:
           (1) IMG-09/10/11, IMG-I01〜I06 をメディアライブラリへ登録
