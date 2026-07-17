@@ -15,6 +15,7 @@ define( 'AISHIN_VERSION', '0.1.0' );
 require_once get_template_directory() . '/inc/puzzle-paths.php';
 require_once get_template_directory() . '/inc/image-frame.php';
 require_once get_template_directory() . '/inc/word-pieces.php';
+require_once get_template_directory() . '/inc/cpt-interview.php';
 
 /**
  * テーマ基本設定
