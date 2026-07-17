@@ -1,8 +1,8 @@
 <?php
 /**
  * 共通ヘッダー
- * <head> は React版 index.html と同一のタグ構成を出力する（Phase 1.5）。
- * ヘッダーナビ本体（Header.tsx の移植）は Phase 2.1 で実装する。
+ * <head> は React版 index.html と同一のタグ構成。
+ * ヘッダーナビは React版 Header.tsx の移植（開閉・スクロール挙動は assets/js/header.js）。
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,6 +10,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $aishin_images = get_template_directory_uri() . '/assets/images';
+
+/*
+ * ナビゲーション（Header.tsx の NAV_ITEMS と同一。
+ * INTERVIEW は一覧ページ廃止に伴いナビにない）
+ */
+$aishin_nav_items = array(
+	array( home_url( '/' ), 'ABOUT', is_front_page() ),
+	array( home_url( '/service/' ), 'SERVICE', is_page( 'service' ) ),
+	array( home_url( '/works/' ), 'WORKS', is_page( 'works' ) ),
+	array( home_url( '/career/' ), 'CAREER', is_page( 'career' ) ),
+);
 ?>
 <!doctype html>
 <html lang="ja">
@@ -32,8 +43,34 @@ $aishin_images = get_template_directory_uri() . '/assets/images';
     />
     <?php wp_head(); ?>
   </head>
-  <body>
-    <?php
-    // Phase 2 で CustomCursor / FloatingBg / ヘッダーナビをここに実装する
-    ?>
+  <body<?php aishin_body_attrs(); ?>>
+    <?php get_template_part( 'template-parts/floating-bg' ); ?>
+    <header class="header">
+      <div class="header__inner">
+        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="header__logo" aria-label="AISHIN トップページ">
+          <?php /* [IMG-LOGO] ロゴ画像に差し替え予定（React版と同じくテキスト+マークで代用） */ ?>
+          <span class="header__logo-mark" aria-hidden="true"></span>AISHIN</a>
+
+        <nav class="header__nav" aria-label="メインナビゲーション">
+          <?php foreach ( $aishin_nav_items as $aishin_item ) : list( $aishin_url, $aishin_label, $aishin_active ) = $aishin_item; ?>
+          <a href="<?php echo esc_url( $aishin_url ); ?>" class="header__link<?php echo $aishin_active ? ' active' : ''; ?>"<?php echo $aishin_active ? ' aria-current="page"' : ''; ?>><?php echo esc_html( $aishin_label ); ?></a>
+          <?php endforeach; ?>
+          <a href="<?php echo esc_url( home_url( '/entry/' ) ); ?>" class="header__entry">ENTRY</a>
+        </nav>
+
+        <button type="button" class="header__burger" aria-label="メニューを開く" aria-expanded="false">
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      <div class="header__drawer" aria-hidden="true">
+        <nav aria-label="モバイルナビゲーション">
+          <?php foreach ( $aishin_nav_items as $aishin_item ) : list( $aishin_url, $aishin_label, $aishin_active ) = $aishin_item; ?>
+          <a href="<?php echo esc_url( $aishin_url ); ?>" class="header__drawer-link<?php echo $aishin_active ? ' active' : ''; ?>" style="transition-delay: 0ms;"<?php echo $aishin_active ? ' aria-current="page"' : ''; ?>><?php echo esc_html( $aishin_label ); ?></a>
+          <?php endforeach; ?>
+          <a href="<?php echo esc_url( home_url( '/entry/' ) ); ?>" class="header__drawer-link header__drawer-link--entry" style="transition-delay: 0ms;">ENTRY →</a>
+        </nav>
+      </div>
+    </header>
     <main>

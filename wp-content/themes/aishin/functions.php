@@ -12,6 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'AISHIN_VERSION', '0.1.0' );
 
+require_once get_template_directory() . '/inc/puzzle-paths.php';
+require_once get_template_directory() . '/inc/image-frame.php';
+require_once get_template_directory() . '/inc/word-pieces.php';
+
 /**
  * テーマ基本設定
  *
@@ -51,15 +55,69 @@ function aishin_has_hero() {
  */
 function aishin_enqueue_scripts() {
 	$vendor = get_template_directory_uri() . '/assets/vendor';
+	$js     = get_template_directory_uri() . '/assets/js';
 
 	wp_enqueue_script( 'gsap', $vendor . '/gsap.min.js', array(), '3.15.0', true );
 	wp_enqueue_script( 'gsap-scrolltrigger', $vendor . '/ScrollTrigger.min.js', array( 'gsap' ), '3.15.0', true );
 
+	// 全ページ共通
+	wp_enqueue_script( 'aishin-header', $js . '/header.js', array(), AISHIN_VERSION, true );
+	wp_enqueue_script( 'aishin-cursor', $js . '/cursor.js', array(), AISHIN_VERSION, true );
+	wp_enqueue_script( 'aishin-floating-bg', $js . '/floating-bg.js', array(), AISHIN_VERSION, true );
+	wp_enqueue_script( 'aishin-animations', $js . '/animations.js', array( 'gsap', 'gsap-scrolltrigger' ), AISHIN_VERSION, true );
+
+	// ヒーロー（物理演算）のあるページ
 	if ( aishin_has_hero() ) {
 		wp_enqueue_script( 'matter-js', $vendor . '/matter.min.js', array(), '0.20.0', true );
+		wp_enqueue_script( 'aishin-physics', $js . '/physics-pieces.js', array( 'matter-js', 'gsap' ), AISHIN_VERSION, true );
+	}
+
+	// トップページ専用（ローダー / WebGL液体背景 / FVキネティックタイポ）
+	if ( is_front_page() ) {
+		wp_enqueue_script( 'aishin-loader', $js . '/loader.js', array( 'gsap' ), AISHIN_VERSION, true );
+		wp_enqueue_script( 'aishin-liquid-bg', $js . '/liquid-bg.js', array(), AISHIN_VERSION, true );
+		wp_enqueue_script( 'aishin-hero', $js . '/hero.js', array( 'gsap', 'aishin-physics', 'aishin-loader' ), AISHIN_VERSION, true );
+	}
+
+	// 下層固定ページ共通ヒーロー
+	if ( is_page( array( 'service', 'works', 'career', 'entry' ) ) ) {
+		wp_enqueue_script( 'aishin-page-hero', $js . '/page-hero.js', array( 'gsap', 'aishin-physics' ), AISHIN_VERSION, true );
+	}
+
+	// ENTRYフォーム
+	if ( is_page( 'entry' ) ) {
+		wp_enqueue_script( 'aishin-entry-form', $js . '/entry-form.js', array(), AISHIN_VERSION, true );
+	}
+
+	// インタビュー詳細
+	if ( is_singular( 'interview' ) ) {
+		wp_enqueue_script( 'aishin-interview', $js . '/interview.js', array( 'gsap', 'aishin-physics' ), AISHIN_VERSION, true );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'aishin_enqueue_scripts' );
+
+/**
+ * <body> に付与する属性を出力する。
+ * data-skew-targets: スクロール速度連動skew演出の対象セレクタ（animations.js が参照。
+ * React版で各ページが useSubpageAnimations({ skewTargets }) に渡していた値と同一）
+ */
+function aishin_body_attrs() {
+	$skew = '';
+	if ( is_front_page() ) {
+		$skew = '.mission__statement, .works__cards, .interview__cards, .career__list';
+	} elseif ( is_page( 'service' ) ) {
+		$skew = '.svc__points, .svc__steps';
+	} elseif ( is_page( 'works' ) ) {
+		$skew = '.wrk__rows';
+	} elseif ( is_page( 'career' ) ) {
+		$skew = '.crr__benefits';
+	} elseif ( is_singular( 'interview' ) ) {
+		$skew = '.itv-qa__body';
+	}
+	if ( $skew ) {
+		echo ' data-skew-targets="' . esc_attr( $skew ) . '"';
+	}
+}
 
 /**
  * wp_head の不要な標準出力を除去する
