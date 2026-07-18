@@ -19,9 +19,9 @@ progress.txt — AI作業タスク一覧（WordPress版 アイシンコーポレ
 Phase 1: 基盤構築（ローカル環境・テーマ雛形・素材・CSS）
 ====================================================================
 
-[~] Phase 1.1 Docker ローカルWordPress環境の構築
-    （2026-07-17 ファイル作成完了。動作確認は Work 1.1 Docker Desktop
-      インストール待ち。wpcli サービスも追加済み）
+[x] Phase 1.1 Docker ローカルWordPress環境の構築
+    （2026-07-18 完了。docker compose up -d で3コンテナ起動・
+      http://localhost:8000 でWPインストール完了を確認）
     対象: docker-compose.yml, .gitignore, README.md
     内容: services = wordpress(latest, port 8000) / db(mysql:8.0) / phpmyadmin(port 8080)。
           ./wp-content/themes/aishin を /var/www/html/wp-content/themes/aishin にマウント。
@@ -30,8 +30,8 @@ Phase 1: 基盤構築（ローカル環境・テーマ雛形・素材・CSS）
     完了条件: docker compose up -d 後 http://localhost:8000 でWPインストール画面が
               表示され、日本語でインストール完了できる。
 
-[~] Phase 1.2 テーマ雛形「aishin」の作成
-    （2026-07-17 ファイル作成完了。有効化確認はDocker起動後）
+[x] Phase 1.2 テーマ雛形「aishin」の作成（2026-07-18 完了。テーマ有効化・
+      全ページ200応答を確認）
     対象: wp-content/themes/aishin/{style.css, functions.php, index.php,
           front-page.php(仮), header.php(仮), footer.php(仮)}
     内容: style.css にテーマヘッダーコメント（Theme Name: aishin 等）。
@@ -55,8 +55,8 @@ Phase 1: 基盤構築（ローカル環境・テーマ雛形・素材・CSS）
           import順と同じ）。style.css（テーマヘッダー用）にはスタイルを書かない。
     完了条件: 3ファイルが diff で元と同一。ページソースで読み込み順が正しい。
 
-[~] Phase 1.5 head出力（フォント・メタ・favicon）の実装
-    （2026-07-17 header.php実装完了。出力HTML照合はDocker起動後）
+[x] Phase 1.5 head出力（フォント・メタ・favicon）の実装（2026-07-18 完了。
+      title/description/theme-color/favicon/Google Fonts の出力を確認）
     対象: header.php, functions.php
     内容: React版 index.html と同一の head 要素を出力する。
           - lang="ja" / charset / viewport
@@ -70,9 +70,8 @@ Phase 1: 基盤構築（ローカル環境・テーマ雛形・素材・CSS）
     完了条件: 出力HTMLの該当タグが React版 index.html と一致（wp_head が出す
               WP標準タグの追加は許容。emoji系スクリプト等の不要出力は削除）。
 
-[~] Phase 1.6 JSライブラリの同梱とenqueue
-    （2026-07-17 配置・enqueue実装完了（gsap 3.15.0/matter 0.20.0）。
-      コンソール確認はDocker起動後）
+[x] Phase 1.6 JSライブラリの同梱とenqueue（2026-07-18 完了。gsap/ScrollTrigger/
+      matter.min.js と自作JS群のenqueue・200配信を確認）
     対象: assets/vendor/gsap.min.js, assets/vendor/ScrollTrigger.min.js,
           assets/vendor/matter.min.js, functions.php
     内容: gsap@3.12.5 / ScrollTrigger@3.12.5 / matter-js@0.20.0 の min ファイルを
