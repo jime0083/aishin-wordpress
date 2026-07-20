@@ -95,7 +95,10 @@ Work 3: Lightsail サーバーの作成
     目安時間: 5分
     費用: インスタンスにアタッチしている限り無料。
 
-[ ] Work 3.3 SSH接続確認と初期パスワードの取得
+[x] Work 3.3 SSH接続確認と初期パスワードの取得（2026-07-20 完了。ブラウザ内SSH接続確認。
+    ※このイメージはAWS版WordPressのため初期PWは application_credentials
+    （→/opt/aws/wordpress/credentials.log）にあり。ユーザー名 user のPWをユーザーが
+    パスワード管理ツールに控え済み。PW値は記録ファイルに書かない）
     期限（最悪）: Work 5.1（本番反映）の前
     内容: Lightsailのブラウザ内SSH（またはローカルターミナル）で接続し、
           cat ~/bitnami_application_password でWordPress管理者（user）の
