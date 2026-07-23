@@ -186,9 +186,14 @@ Work 5: 本番デプロイと初期設定
     目安時間: 30分
     確認方法: 本番URLで全ページが表示される。
 
-[ ] Work 5.2 WordPressセキュリティ初期設定
+[x] Work 5.2 WordPressセキュリティ初期設定（2026-07-23 完了）
     期限（最悪）: Work 5.4（本番動作確認）の前。特に管理者パスワード変更は
     サイト公開（DNS向け先変更）と同時に必ず実施
+    ※実施: (1)管理者user のPWを強固なものに変更（パスワード管理ツールで管理）
+      (2)ACF以外の同梱プラグインを全削除（Akismet/AIOSEO/AMP/Jetpack/移行系）
+      (3)Limit Login Attempts Reloaded（作者WPChef・現行版）導入・有効化
+      (4)サイトURLがHTTPSで動作することを確認済み
+      (5)ACF・LLARの自動更新を有効化
     内容: (1) 管理者パスワードを強固なものに変更（初期userのままにしない）
           (2) 不要なデフォルトプラグイン・テーマの削除
           (3) ログイン試行制限プラグイン（Limit Login Attempts Reloaded）の
