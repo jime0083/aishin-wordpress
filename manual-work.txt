@@ -165,8 +165,20 @@ Work 4: ドメインとHTTPS（本番同等セキュリティ・予算最小）
 Work 5: 本番デプロイと初期設定
 ====================================================================
 
-[ ] Work 5.1 テーマ・プラグインの本番反映
+[x] Work 5.1 テーマ・プラグインの本番反映（2026-07-23 完了。https://port3104.com 公開）
     期限（最悪）: 公開したいタイミング（全Phase完了・Work 3完了後）
+    ※実施メモ:
+      - テーマzip(aishin-theme.zip)を管理画面からアップロード・有効化
+      - ACF(Advanced Custom Fields)を管理画面から導入・有効化
+      - シードはGitHub raw URLからwget→wp eval-file で実行:
+        seed-pages.php / seed-interviews.php（--path=/var/www/html --allow-root）
+      - siteurl/homeはwp-config.php側で動的定義（HTTP_HOST）。実アクセスは
+        https://port3104.com で正常（wp-cli表示の127.0.0.1は無害）
+      - ★パーマリンク404問題: Debian標準Apacheは AllowOverride None のため
+        下層ページが404になる。解決: /var/www/html に .htaccess を配置し、
+        conf-available/wp-htaccess.conf（<Directory /var/www/html/> AllowOverride All）
+        を a2enconf で有効化→Apache再起動。deploy/ にファイルをGit管理
+      - 確認: 全ページ200・固有コンテンツ・画像・CSS/JS配信すべてOK
     内容: docs/deploy-package.md（Phase 7.2で作成）に従い、
           (1) 管理画面からテーマzipをアップロード・有効化
           (2) ACFプラグインをインストール・有効化
