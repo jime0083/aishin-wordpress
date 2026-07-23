@@ -17,3 +17,6 @@ tmp/
 
 # インフラ情報の非公開メモ（サーバーIP等・Gitに上げない）
 infra-notes.local.txt
+
+# デプロイ用テーマzip（成果物・Git管理しない）
+aishin-theme.zip

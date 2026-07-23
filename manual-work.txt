@@ -139,8 +139,19 @@ Work 4: ドメインとHTTPS（本番同等セキュリティ・予算最小）
     目安時間: 10分（反映待ちは最大数時間）
     確認方法: http://<ドメイン>/ でサイトが表示される。
 
-[ ] Work 4.3 HTTPS化（Let's Encrypt / bncert-tool）
+[x] Work 4.3 HTTPS化（Let's Encrypt / certbot）（2026-07-23 完了）
     期限（最悪）: Work 5.4（本番動作確認）の前
+    ※重要: このLightsailイメージは「AWS版WordPress + Debian標準Apache 2.4」で、
+      手順書想定の bncert-tool は無い。certbot を使う手順に変更:
+      (1) sudo apt-get install -y certbot python3-certbot-apache
+      (2) sudo certbot --apache -d port3104.com -d www.port3104.com \
+            --non-interactive --agree-tos -m <email> --redirect
+          → 証明書取得は成功するが「vhost ambiguity」でApache適用に失敗
+      (3) 原因: 000-default.conf(:80)/default-ssl.conf(:443) に ServerName 未設定
+          → 両vhostに ServerName port3104.com / ServerAlias www.port3104.com を追加
+      (4) sudo certbot install --cert-name port3104.com -i apache --redirect
+          （-i apache のインストーラー指定が必須）→ 適用成功
+      確認: https=200 / http→https 301 / 証明書=Let's Encrypt / 有効期限2026-10-21・自動更新
     内容: SSHで接続し、AIが手順書に記載するコマンド
           （sudo /opt/bitnami/bncert-tool）を実行。対話プロンプトで
           ドメイン名を入力し、HTTP→HTTPSリダイレクトを有効化する。
