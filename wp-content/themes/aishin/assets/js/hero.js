@@ -20,7 +20,9 @@
 
     if (reduced) {
       gsap.set(chars, { opacity: 1, yPercent: 0, rotate: 0 });
-      gsap.set(['.hero__sub', '.hero__lead', '.hero__scroll-cue', '.hero__badge'], {
+      // hero__badge は含めない: React版では gsap.context(contentRef) のスコープ外に
+      // あるためアニメーション対象にならず、CSS初期値 opacity:0 のまま非表示になる（P-001）
+      gsap.set(['.hero__sub', '.hero__lead', '.hero__scroll-cue'], {
         opacity: 1,
         y: 0,
       });
@@ -56,12 +58,9 @@
           { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' },
           '-=0.55'
         )
-        .fromTo(
-          '.hero__badge',
-          { opacity: 0, scale: 0.5, rotate: -90 },
-          { opacity: 1, scale: 1, rotate: 0, duration: 0.8 },
-          '-=0.5'
-        )
+        // hero__badge のアニメーションは行わない（P-001）: React版では
+        // gsap.context(contentRef) のスコープ外にあるためアニメーション対象にならず、
+        // CSS初期値 opacity:0 のまま非表示になる。その挙動に合わせる。
         .fromTo(
           '.hero__scroll-cue',
           { opacity: 0 },

@@ -15,4 +15,39 @@ problem.txt — 問題・修正の記録
 ====================================================================
 記録
 ====================================================================
-（まだ問題はありません）
+
+## P-001: トップFVに黒い円形の回転バッジ（JOIN OUR TEAM）が表示される（React版にはない）
+- 発生日: 2026-07-23
+- 状態: 修正中
+- 現象: 本番トップページのファーストビュー右下に、黒い円形の回転するバッジ
+        （円周テキスト「JOIN OUR TEAM ・ AISHIN INC. ・ ENTRY ・」＋針マーク）が
+        表示される。React版（正）には表示されていない。全画面幅で発生。
+- 原因: `.hero__badge` は home.css で `opacity: 0`（初期非表示）。JSアニメーションで
+        opacity 1 にして表示する設計。
+        React版 Hero.tsx はこのアニメーションを `gsap.context(fn, contentRef)` の
+        スコープ内で登録しているが、`.hero__badge` は `hero__content`（=contentRef）の
+        **外**（hero__main直下）にあるためセレクタにマッチせず、opacity:0 のまま＝
+        非表示になっている（React版の実挙動）。
+        一方 WordPress版 hero.js は document 全体から `.hero__badge` を取得して
+        アニメーションするため opacity:1 になり表示されてしまう。
+- 修正方針: hero.js から hero__badge のアニメーション（fromtoと reduced時のgsap.set）を
+        削除し、CSS初期値 opacity:0 のまま非表示にする（React版の実挙動と一致）。
+        マークアップ（hero.php の badge）はReact版にもDOMが存在するため残す。
+- 対象: wp-content/themes/aishin/assets/js/hero.js
+
+## P-002: 全ページのENTRYセクションで「ENTRY」文字が枠をはみ出す（中央に収まらない）
+- 発生日: 2026-07-23
+- 状態: 修正中
+- 現象: 全ページ共通の ENTRY CTA セクションで、巨大文字「ENTRY」が点線枠を左右に
+        はみ出す。React版（正）はどの画面幅でも枠内に中央揃えで収まる。
+- 原因: `.entry__char` は `display: inline-block`。inline-block 要素間の改行・空白は
+        レンダリング時に半角スペースとして表示される。
+        WordPress版 section-entry-cta.php は foreach で各 `<span>` を**改行して**
+        出力しているため、E N T R Y の各文字間に空白が入り、`white-space:nowrap` の
+        `.entry__title` の幅が広がって枠をはみ出す。
+        React版（JSX）は要素間に空白が入らないため詰まって枠内に収まる。
+- 修正方針: entry__char の span を改行せず**連続出力**（PHPで echo 連結）して
+        文字間の空白を除去する。同じパターン（HTML直書きforeachでinline-block span）が
+        他テンプレートにないか確認する（loader__brand-char 等）。
+- 対象: wp-content/themes/aishin/template-parts/section-entry-cta.php
+        （必要に応じて template-parts/loader.php も）
