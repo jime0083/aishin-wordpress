@@ -517,25 +517,31 @@ Phase 8: 本番公開後のデザイン修正（React版との差異解消）
 Phase 9: デザインブラッシュアップ（React版に縛られない改善）
 ====================================================================
 
-[ ] Phase 9.1 インタビューQ&A見出し「QUESTION」→「REASON」（P-003）
+[x] Phase 9.1 インタビューQ&A見出し「QUESTION」→「REASON」（P-003）
     対象: single-interview.php
     内容: 各Q&Aセクション eyebrow の "QUESTION" を "REASON" に変更。
     完了条件: 本番インタビュー各ページの見出しが「0N REASON」表示。
 
-[ ] Phase 9.2 レスポンシブ時にQ&A写真を本文より上に配置（P-004）
+[x] Phase 9.2 レスポンシブ時にQ&A写真を本文より上に配置（P-004）
     対象: assets/css/subpage.css
     内容: @media(max-width:900px) 内で .itv-qa__media と .itv-qa__media--first を
           order:-1 にし、写真を常に本文の上に表示する。ブラッシュアップ由来の
           変更はコメントで明記。
     完了条件: 900px以下で各Q&Aの写真がセクション上部（本文の上）に表示される。
 
-[ ] Phase 9.3 Q&A2つ目に各社員の指定画像を配置（P-005）
+[x] Phase 9.3 Q&A2つ目に各社員の指定画像を配置（P-005）
     対象: assets/images/opt/IMG-I07..I09.jpg（新規）, seed/seed-interviews.php
     内容: (1)指定画像（佐藤3/田中1/山本1.png）をWeb用に最適化（幅1600px JPEG）し
           IMG-I07(佐藤)/IMG-I08(田中)/IMG-I09(山本) として opt/ に配置。
           (2)seed-interviews.php の各社員 qa2 の photo にIDを設定＋photo_label設定。
           (3)ローカル再シードで確認。本番は画像配置＋テーマ更新＋seed再実行で反映。
     完了条件: 各インタビューのQ&A2つ目に指定画像が表示される（1カラム→2カラム化）。
+
+[ ] Phase 9.4 山本のポートレートを山本7.pngに変更（カード・FV共用・P-006）
+    対象: assets/images/opt/IMG-Y11.jpg（新規）, seed/seed-interviews.php
+    内容: 山本7.png をWeb用JPEG化し IMG-Y11 として配置。seedの山本 portrait_img を
+          IMG-Y11 に変更。カード（トップ・他インタビュー）と詳細FVの両方に反映。
+    完了条件: 山本のカード画像と詳細ページFVポートレートが山本7.pngに変わる。
 
 ====================================================================
 更新履歴
