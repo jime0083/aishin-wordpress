@@ -674,9 +674,10 @@
     max-width: 340px;
   }
 
-  /* モバイルでは常に 本文 → 写真 の順 */
+  /* ブラッシュアップ(P-004): モバイルでは常に 写真 → 本文 の順（写真をセクション上部へ） */
+  .itv-qa__media,
   .itv-qa__media--first {
-    order: 0;
+    order: -1;
   }
 
   .crr__benefits {
