@@ -108,7 +108,7 @@ function aishin_body_attrs() {
 	if ( is_front_page() ) {
 		$skew = '.mission__statement, .works__cards, .interview__cards, .career__list';
 	} elseif ( is_page( 'service' ) ) {
-		$skew = '.svc__points, .svc__steps';
+		$skew = '.svc__points';
 	} elseif ( is_page( 'works' ) ) {
 		$skew = '.wrk__rows';
 	} elseif ( is_page( 'career' ) ) {

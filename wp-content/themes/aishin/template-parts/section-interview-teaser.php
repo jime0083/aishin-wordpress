@@ -15,7 +15,7 @@ $aishin_members = aishin_get_interviews();
   <?php get_template_part( 'template-parts/giant-word', null, array( 'text' => 'PEOPLE', 'side' => 'right' ) ); ?>
   <div class="container">
     <p class="section__eyebrow" data-reveal>
-      <span class="section__eyebrow-num">04</span> INTERVIEW
+      INTERVIEW
     </p>
     <div class="section__head" data-reveal>
       <h2 class="section__title">

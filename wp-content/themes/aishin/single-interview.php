@@ -36,8 +36,17 @@ while ( have_posts() ) :
     <div class="itv-hero__body">
       <p class="itv-hero__eyebrow">INTERVIEW <?php echo esc_html( $aishin_slug ); ?></p>
       <h1 class="itv-hero__quote"><?php
-      foreach ( preg_split( '//u', $aishin_quote, -1, PREG_SPLIT_NO_EMPTY ) as $aishin_ch ) {
-			echo '<span class="itv-hero__char">' . esc_html( $aishin_ch ) . '</span>';
+      // quote 内の改行（\n）で行を分け、各行を1文字ずつ itv-hero__char で出力（P-012〜014）。
+      // 行間は <br> で改行。interview.js のキネティック出現（.itv-hero__char対象）は維持される。
+      $aishin_quote_lines = preg_split( '/\r\n|\r|\n/u', $aishin_quote );
+      $aishin_line_total  = count( $aishin_quote_lines );
+      foreach ( $aishin_quote_lines as $aishin_li => $aishin_line ) {
+			foreach ( preg_split( '//u', $aishin_line, -1, PREG_SPLIT_NO_EMPTY ) as $aishin_ch ) {
+				echo '<span class="itv-hero__char">' . esc_html( $aishin_ch ) . '</span>';
+			}
+			if ( $aishin_li < $aishin_line_total - 1 ) {
+				echo '<br />';
+			}
 		}
 		?></h1>
       <p class="itv-hero__name">
@@ -96,7 +105,7 @@ for ( $aishin_i = 0; $aishin_i < 3; $aishin_i++ ) :
 <section class="section itv-qa">
   <div class="container">
     <p class="section__eyebrow" data-reveal>
-      <span class="section__eyebrow-num"><?php echo esc_html( '0' . $aishin_n ); ?></span> REASON
+      REASON
     </p>
     <h2 class="section__title itv-qa__heading"><?php echo esc_html( $aishin_heading ); ?></h2>
     <div class="itv-qa__grid <?php echo $aishin_photo_src ? '' : 'itv-qa__grid--single'; ?>">

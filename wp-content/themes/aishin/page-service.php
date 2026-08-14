@@ -124,7 +124,7 @@ get_template_part( 'template-parts/page-hero', null, array( 'title' => 'SERVICE'
   <?php get_template_part( 'template-parts/giant-word', null, array( 'text' => $aishin_s['giant'], 'side' => $aishin_flip ? 'left' : 'right' ) ); ?>
   <div class="container">
     <p class="section__eyebrow" data-reveal>
-      <span class="section__eyebrow-num"><?php echo esc_html( $aishin_s['num'] ); ?></span> <?php echo esc_html( strtoupper( $aishin_s['title'] ) ); ?>
+      <?php echo esc_html( strtoupper( $aishin_s['title'] ) ); ?>
     </p>
     <div class="svc__grid <?php echo $aishin_flip ? 'svc__grid--flip' : ''; ?>">
       <div class="svc__media" data-reveal>
@@ -155,23 +155,10 @@ get_template_part( 'template-parts/page-hero', null, array( 'title' => 'SERVICE'
     <div class="svc__points" data-reveal-group>
       <?php foreach ( $aishin_s['offers'] as $aishin_j => $aishin_o ) : ?>
       <div class="svc__point">
-        <span class="svc__point-num"><?php echo esc_html( $aishin_s['num'] . '-' . ( $aishin_j + 1 ) ); ?></span>
         <h3><?php echo esc_html( $aishin_o['title'] ); ?></h3>
         <p><?php echo esc_html( $aishin_o['desc'] ); ?></p>
       </div>
       <?php endforeach; ?>
-    </div>
-
-    <div data-reveal>
-      <h3 class="svc__label">進め方</h3>
-      <ol class="svc__steps">
-        <?php foreach ( $aishin_s['steps'] as $aishin_j => $aishin_step ) : ?>
-        <li class="svc__step">
-          <span class="svc__step-num">STEP <?php echo esc_html( $aishin_j + 1 ); ?></span>
-          <span class="svc__step-title"><?php echo esc_html( $aishin_step ); ?></span>
-        </li>
-        <?php endforeach; ?>
-      </ol>
     </div>
   </div>
 </section>

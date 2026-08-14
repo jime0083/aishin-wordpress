@@ -13,7 +13,7 @@ $aishin_statement_lines = array( '世界は、まだ未完成。', 'ピースは
   <?php get_template_part( 'template-parts/giant-word', null, array( 'text' => 'MISSION', 'side' => 'right' ) ); ?>
   <div class="container">
     <p class="section__eyebrow" data-reveal>
-      <span class="section__eyebrow-num">01</span> MISSION
+      MISSION
     </p>
     <h2 class="mission__statement">
       <?php foreach ( $aishin_statement_lines as $aishin_line ) : ?>

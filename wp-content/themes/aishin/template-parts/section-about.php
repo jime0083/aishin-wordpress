@@ -28,7 +28,7 @@ $aishin_profile = array(
   <?php get_template_part( 'template-parts/giant-word', null, array( 'text' => 'ABOUT', 'side' => 'left' ) ); ?>
   <div class="container">
     <p class="section__eyebrow" data-reveal>
-      <span class="section__eyebrow-num">02</span> ABOUT US
+      ABOUT US
     </p>
     <div class="about__grid">
       <div class="about__text" data-reveal>

@@ -124,8 +124,8 @@
   font-weight: 800;
   font-size: clamp(4rem, 8vw, 6.5rem);
   line-height: 1;
-  color: transparent;
-  -webkit-text-stroke: 2px var(--orange);
+  /* ブラッシュアップ(P-011): 枠線のみ→枠線と同じオレンジで塗りつぶし */
+  color: var(--orange);
   pointer-events: none;
 }
 

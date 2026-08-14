@@ -33,7 +33,7 @@ $aishin_works = array(
   <?php get_template_part( 'template-parts/giant-word', null, array( 'text' => 'WORKS', 'side' => 'left' ) ); ?>
   <div class="container">
     <p class="section__eyebrow" data-reveal>
-      <span class="section__eyebrow-num">03</span> WORKS
+      WORKS
     </p>
     <div class="section__head" data-reveal>
       <h2 class="section__title">

@@ -26,7 +26,7 @@ $aishin_supports = array(
   <?php get_template_part( 'template-parts/giant-word', null, array( 'text' => 'GROWTH', 'side' => 'left' ) ); ?>
   <div class="container">
     <p class="section__eyebrow" data-reveal>
-      <span class="section__eyebrow-num">05</span> CAREER SUPPORT
+      CAREER SUPPORT
     </p>
     <div class="career__grid">
       <div class="career__text" data-reveal>
