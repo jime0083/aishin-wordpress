@@ -545,6 +545,59 @@ Phase 9: デザインブラッシュアップ（React版に縛られない改善
     完了条件: 山本のカード画像と詳細ページFVポートレートが山本7.pngに変わる。
 
 ====================================================================
+Phase 10: デザインブラッシュアップ 第2弾（2026-08-14 ユーザー要望）
+====================================================================
+※本Phaseは「記録・タスク切り出しのみ」実施。修正はユーザー指示後に着手する。
+
+[ ] Phase 10.1 全セクション eyebrow の数字（01/02等）を削除（P-007）
+    対象: template-parts/section-mission.php / section-about.php /
+          section-works-teaser.php / section-interview-teaser.php /
+          section-career-teaser.php / page-service.php / single-interview.php
+    内容: 各テンプレートの <span class="section__eyebrow-num">NN</span> を削除
+          （eyebrowのラベル文字は残す）。
+    完了条件: 全ページの各セクション eyebrow から番号が消える。
+
+[ ] Phase 10.2 佐藤美咲のポートレートを佐藤5.pngに変更（カード・FV共用・P-008）
+    対象: assets/images/opt/（新規・例 IMG-S05）, seed/seed-interviews.php
+    内容: 佐藤5.png をWeb用JPEG化し新IDで配置、seedの佐藤 portrait_img を差し替え。
+          P-006と同方式（新IDで本番メディアを確実に差替）。
+    完了条件: トップ・インタビューの佐藤カード/詳細FVが佐藤5.pngに変わる。
+
+[ ] Phase 10.3 SERVICE各セクションの「進め方」要素を削除（P-009）
+    対象: wp-content/themes/aishin/page-service.php（必要ならfunctions.phpのskew対象）
+    内容: 「進め方」ブロック（svc__label「進め方」〜svc__steps STEP1-4）を削除。
+          SERVICESデータの steps 定義・skew対象(.svc__steps)も整理。
+    完了条件: SERVICE各セクションから「進め方/STEP」表示が消える。
+
+[ ] Phase 10.4 SERVICEの svc__point-num（01-1/01-2等）を削除（P-010）
+    対象: wp-content/themes/aishin/page-service.php
+    内容: offer見出しの <span class="svc__point-num">{num}-{j+1}</span> を削除。
+    完了条件: SERVICE各offerから「01-1」等の番号が消える（title/descは残る）。
+
+[ ] Phase 10.5 SERVICE/WORKS 画像上の大きな数字(svc__num)を塗りつぶしに（P-011）
+    対象: wp-content/themes/aishin/assets/css/subpage.css
+    内容: .svc__num の color:transparent + -webkit-text-stroke を、塗りつぶし
+          （例 color: var(--orange)・stroke削除）に変更。塗り色/不透明度は着手時に確認。
+    完了条件: SERVICE・WORKSの画像上の数字が塗りつぶし表示になる。
+
+[ ] Phase 10.6 インタビューFV文章の改行対応＋各社員の文言変更（P-012/013/014）
+    対象: single-interview.php（FV quote改行対応）, seed/seed-interviews.php（3名のquote）
+    内容: (1)single-interview.php に quote の改行対応を追加（行区切りで分割し
+          itv-hero__char を行ごとに出力、interview.js のキネティック出現を壊さない）。
+          (2)seed各社員quoteを変更:
+             佐藤=「1年目から」／「「あなたはどう思う？」と問われ続ける環境」
+             田中=「前職の倍のスピード感と裁量」／「成長痛すら楽しい」
+             山本=「29歳でマネージャーに」／「年齢ではなく挑戦が評価される会社」
+                  ※ユーザー原文「朝鮮」は「挑戦」の誤字と思われる→着手時に確認
+    完了条件: 3名のFV一言が指定の文言・2行改行で表示される。
+
+[ ] Phase 10.7 山本の1セクション目本文の一部変更（P-015）
+    対象: seed/seed-interviews.php
+    内容: 山本 qa1 本文の「「どんなピースを発明したか」だけだったこと。」を
+          「「どんな挑戦をし結果を残したか」だけだったこと。」に変更、再シードで反映。
+    完了条件: 山本qa1の該当文が新文言になる。
+
+====================================================================
 更新履歴
 ====================================================================
 2026-07-17: 初版作成（要件定義・全タスク切り出し完了）

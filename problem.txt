@@ -104,3 +104,98 @@ problem.txt — 問題・修正の記録
           IMG-11上書きだと本番メディアが差し替わらない。新IDで確実に差し替える。
         既存の幅より小さい画像だが、元画像がこの解像度のため原寸で使用。
 - 対象: assets/images/opt/IMG-Y11.jpg（新規）, seed/seed-interviews.php
+
+## P-007: 全セクション上部の eyebrow 数字（01/02等）を削除（ブラッシュアップ）
+- 発生日: 2026-08-14
+- 状態: 記録のみ（未着手）
+- 現象: トップ（MISSION/ABOUT/WORKS/INTERVIEW/CAREER）・SERVICE各セクション・
+        CAREER・社員インタビューの各セクション上部 eyebrow に「01」「02」等の
+        番号が付いている。この番号が不要なので削除したい。
+- 原因: 各テンプレートで <span class="section__eyebrow-num">NN</span> を出力している。
+        使用箇所: section-mission.php(01) / section-about.php(02) /
+        section-works-teaser.php(03) / section-interview-teaser.php(04) /
+        section-career-teaser.php(05) / page-service.php(各num) /
+        single-interview.php('0'.$n)
+- 修正方針: 上記各テンプレートから section__eyebrow-num の span を削除する
+        （eyebrow のラベル文字は残す）。CSS .section__eyebrow-num は残しても無害。
+- 対象: 上記テンプレート群
+
+## P-008: 佐藤美咲のポートレート（カード・詳細FV共用）を佐藤5.pngに変更（ブラッシュアップ）
+- 発生日: 2026-08-14
+- 状態: 記録のみ（未着手）
+- 現象: トップページ・インタビューページの佐藤美咲の画像を source-images/佐藤5.png に
+        変更したい。
+- 原因: seed-interviews.php の佐藤 portrait_img = IMG-09。
+- 修正方針: 佐藤5.png をWeb用JPEG化し新ID（例 IMG-S05）で opt/ に配置、seed の
+        佐藤 portrait_img を差し替え（山本7の対応=P-006と同方式・新IDで確実に差替）。
+        カード・詳細FV両方に反映される。
+- 対象: assets/images/opt/（新規）, seed/seed-interviews.php
+
+## P-009: SERVICEページ各セクションの「進め方」要素を削除（ブラッシュアップ）
+- 発生日: 2026-08-14
+- 状態: 記録のみ（未着手）
+- 現象: SERVICE各セクション下部の「進め方」(svc__label + STEP1〜4 のリスト)を削除したい。
+- 原因: page-service.php に <h3 class="svc__label">進め方</h3> + <ol class="svc__steps">
+        （svc__step / svc__step-num "STEP N" / svc__step-title）がある。
+- 修正方針: page-service.php の「進め方」ブロック（svc__label「進め方」〜svc__steps）を
+        削除。SERVICESデータの steps 定義は残しても未使用になるだけだが、整理のため
+        削除も検討。body の data-skew-targets の .svc__steps 参照も見直す。
+- 対象: wp-content/themes/aishin/page-service.php（必要ならfunctions.phpのskew対象）
+
+## P-010: SERVICE各セクションの svc__point-num（01-1/01-2等）を削除（ブラッシュアップ）
+- 発生日: 2026-08-14
+- 状態: 記録のみ（未着手）
+- 現象: SERVICE各セクション下部の offer 見出しにある「01-1」「01-2」等の番号を削除したい。
+- 原因: page-service.php に <span class="svc__point-num">{num}-{j+1}</span> がある。
+- 修正方針: page-service.php から svc__point-num の span を削除（offer の title/desc は残す）。
+- 対象: wp-content/themes/aishin/page-service.php
+
+## P-011: SERVICE/WORKS 画像上の大きな数字(svc__num)を枠線のみ→塗りつぶしに変更（ブラッシュアップ）
+- 発生日: 2026-08-14
+- 状態: 記録のみ（未着手）
+- 現象: SERVICE・WORKS各セクションの画像左上（flip時は右）にある大きな01,02等の数字が
+        現在アウトライン（枠線のみ・中身透明）。これを塗りつぶしデザインに変更したい。
+- 原因: subpage.css の .svc__num が color:transparent; -webkit-text-stroke:2px orange。
+- 修正方針: .svc__num を塗りつぶし（例: color: var(--orange) にして text-stroke 削除、
+        または薄い塗り）に変更。SERVICE/WORKS共通(.svc__num流用)なので両方に反映。
+        具体的な塗り色・不透明度は着手時にReact版/デザイン意図と合わせ確認。
+- 対象: wp-content/themes/aishin/assets/css/subpage.css
+
+## P-012: 佐藤のインタビューFV文章を2行に改行（ブラッシュアップ）
+- 発生日: 2026-08-14
+- 状態: 記録のみ（未着手）
+- 現象: 佐藤FVの一言「1年目から「あなたはどう思う？」と問われ続ける環境」を
+        「1年目から」／「「あなたはどう思う？」と問われ続ける環境」の2行で改行したい。
+- 原因: single-interview.php は quote を1文字ずつ span 化しており、改行の仕組みがない。
+- 修正方針: FV quote に改行位置を持たせる仕組みを追加（例: quoteを行区切り文字で分割し
+        行ごとに itv-hero__char を出力、行間で改行/ブロック化）。キネティック出現
+        アニメ(interview.js の itv-hero__char)を壊さないよう配慮。佐藤quoteに改行位置を設定。
+- 対象: single-interview.php（改行対応）, seed/seed-interviews.php（佐藤quoteの改行位置）
+        ※P-013/P-014と共通の「FV改行対応」を含む
+
+## P-013: 田中のインタビューFV文章を変更＋2行に（ブラッシュアップ）
+- 発生日: 2026-08-14
+- 状態: 記録のみ（未着手）
+- 現象: 田中FVを「前職の倍のスピード感と裁量」／「成長痛すら楽しい」の2行に変更したい。
+        （現: 「前職の倍のスピードで倍の裁量。成長痛すら楽しい」）
+- 修正方針: seed の田中 quote を新文言＋改行位置に変更（P-012のFV改行対応を利用）。
+- 対象: seed/seed-interviews.php（+ P-012のsingle-interview.php改行対応）
+
+## P-014: 山本のインタビューFV文章を変更＋2行に（ブラッシュアップ）
+- 発生日: 2026-08-14
+- 状態: 記録のみ（未着手）
+- 現象: 山本FVを「29歳でマネージャーに」／「年齢ではなく挑戦が評価される会社」の2行に
+        変更したい。（現: 「29歳でマネージャーに。年齢ではなく挑戦で評価される会社」）
+        ※ユーザー原文は「朝鮮が評価される会社」だが「挑戦」の誤字と思われる。
+          修正着手時に「挑戦」でよいか確認する。
+- 修正方針: seed の山本 quote を新文言＋改行位置に変更（P-012のFV改行対応を利用）。
+- 対象: seed/seed-interviews.php（+ P-012のsingle-interview.php改行対応）
+
+## P-015: 山本の1セクション目本文の一部を変更（ブラッシュアップ）
+- 発生日: 2026-08-14
+- 状態: 記録のみ（未着手）
+- 現象: 山本 qa1 本文の「評価の物差しが年齢でも社歴でもなく、「どんなピースを発明したか」
+        だけだったこと。」を「…「どんな挑戦をし結果を残したか」だけだったこと。」に変更。
+- 原因: seed-interviews.php 山本 qa1 body の該当文。
+- 修正方針: seed の該当文を差し替え、再シードで反映。
+- 対象: seed/seed-interviews.php
