@@ -199,3 +199,27 @@ problem.txt — 問題・修正の記録
 - 原因: seed-interviews.php 山本 qa1 body の該当文。
 - 修正方針: seed の該当文を差し替え、再シードで反映。
 - 対象: seed/seed-interviews.php
+
+## P-016: 佐藤/山本のFV一言を3行に（追加改行）（ブラッシュアップ）
+- 発生日: 2026-08-17
+- 状態: 記録のみ（未着手）
+- 現象: P-012/P-014で2行にしたFV一言を、さらに改行して3行にしたい。
+        佐藤: 「1年目から」／「「あなたはどう思う？」」／「と問われ続ける環境」
+        山本: 「29歳でマネージャーに」／「年齢ではなく」／「挑戦が評価される会社」
+- 原因: seed の quote が現在2行（\n 1箇所）。改行位置を1つ増やせば3行になる
+        （single-interview.php のFV改行対応=P-012で実装済みのため、テンプレ変更不要）。
+- 修正方針: seed-interviews.php の佐藤・山本 quote に改行(\n)を追加して3行にする。
+        佐藤="1年目から\n「あなたはどう思う？」\nと問われ続ける環境"
+        山本="29歳でマネージャーに\n年齢ではなく\n挑戦が評価される会社"
+- 対象: seed/seed-interviews.php
+
+## P-017: 社員インタビューのREASON見出しに番号を付与（REASON01/02/03）（ブラッシュアップ）
+- 発生日: 2026-08-17
+- 状態: 記録のみ（未着手）
+- 現象: P-007で各セクションeyebrowの数字を削除したが、インタビューのQ&A見出し
+        「REASON」には上から順に番号を振りたい（REASON01 / REASON02 / REASON03）。
+        ※P-007の「番号削除」とは別方針（インタビューのREASONのみ番号を付ける）。
+- 原因: single-interview.php は現在 eyebrow を「REASON」のみ出力（P-007で番号削除済み）。
+- 修正方針: single-interview.php の eyebrow を「REASON」+ ゼロ埋め番号（'0'.$aishin_n）に
+        変更。表記は「REASON01」等（半角数字2桁）。他セクションの数字削除(P-007)は維持。
+- 対象: wp-content/themes/aishin/single-interview.php

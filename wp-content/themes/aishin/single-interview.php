@@ -105,7 +105,7 @@ for ( $aishin_i = 0; $aishin_i < 3; $aishin_i++ ) :
 <section class="section itv-qa">
   <div class="container">
     <p class="section__eyebrow" data-reveal>
-      REASON
+      REASON<?php echo esc_html( '0' . $aishin_n ); ?>
     </p>
     <h2 class="section__title itv-qa__heading"><?php echo esc_html( $aishin_heading ); ?></h2>
     <div class="itv-qa__grid <?php echo $aishin_photo_src ? '' : 'itv-qa__grid--single'; ?>">
