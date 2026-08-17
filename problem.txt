@@ -255,7 +255,7 @@ problem.txt — 問題・修正の記録
 
 ## P-020: トップCAREERのeyebrowと見出しの間隔が12pxにならない（ブラッシュアップ）
 - 発生日: 2026-08-17
-- 状態: 修正中
+- 状態: 解決済み（2026-08-17・本番反映確認済み）
 - 現象: トップのCAREER SUPPORT（eyebrow）と「成長を、仕組みにする。」（見出し）の間隔が
         P-018で設定した12pxになっておらず、広く見える。
 - 原因: home.css の .career__grid が align-items: center（縦長画像に対しテキストを垂直中央
@@ -267,7 +267,7 @@ problem.txt — 問題・修正の記録
 
 ## P-021: SERVICE各セクションのeyebrowラベル（STRATEGY CONSULTING等）を削除（ブラッシュアップ）
 - 発生日: 2026-08-17
-- 状態: 修正中
+- 状態: 解決済み（2026-08-17・本番反映確認済み）
 - 現象: SERVICE各セクション上部のオレンジ文字（STRATEGY CONSULTING / DX ACCELERATION /
         NEW BUSINESS DESIGN）を削除したい。
 - 原因: page-service.php に <p class="section__eyebrow">strtoupper(title)</p> がある。
@@ -276,7 +276,7 @@ problem.txt — 問題・修正の記録
 
 ## P-022: CAREERページ各項目の番号（01,02等 crr__item-num）を削除（ブラッシュアップ）
 - 発生日: 2026-08-17
-- 状態: 修正中
+- 状態: 解決済み（2026-08-17・本番反映確認済み）
 - 現象: CAREERページ各セクション上部の 01/02/03/04 の番号を削除したい。
 - 原因: page-career.php に <span class="crr__item-num">{num}</span> がある。
 - 修正方針: page-career.php から crr__item-num の span を削除。

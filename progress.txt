@@ -639,17 +639,17 @@ Phase 12: デザインブラッシュアップ 第4弾（2026-08-17 ユーザー
 Phase 13: デザインブラッシュアップ 第5弾（2026-08-17 ユーザー要望）
 ====================================================================
 
-[ ] Phase 13.1 トップCAREERの間隔を12pxに（career__grid上揃え）（P-020）
+[x] Phase 13.1 トップCAREERの間隔を12pxに（career__grid上揃え）（P-020）
     対象: assets/css/home.css
     内容: .career__grid の align-items を center→start に（ABOUTと統一）。
     完了条件: CAREER SUPPORTと見出しの間隔が12pxになる。
 
-[ ] Phase 13.2 SERVICE eyebrowラベル削除（P-021）
+[x] Phase 13.2 SERVICE eyebrowラベル削除（P-021）
     対象: page-service.php
     内容: 各セクションの section__eyebrow（STRATEGY CONSULTING等）ブロックを削除。
     完了条件: SERVICE各セクション上部のオレンジ文字が消える。
 
-[ ] Phase 13.3 CAREERページの番号(01,02等)削除（P-022）
+[x] Phase 13.3 CAREERページの番号(01,02等)削除（P-022）
     対象: page-career.php
     内容: crr__item-num の span を削除。
     完了条件: CAREER各項目から番号が消える。
