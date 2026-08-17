@@ -281,3 +281,15 @@ problem.txt — 問題・修正の記録
 - 原因: page-career.php に <span class="crr__item-num">{num}</span> がある。
 - 修正方針: page-career.php から crr__item-num の span を削除。
 - 対象: wp-content/themes/aishin/page-career.php
+
+## P-023: ヒーロー系の上余白を8の倍数に統一（ブラッシュアップ）
+- 発生日: 2026-08-17
+- 状態: 修正中
+- 現象: header-h(76px)を含む上余白が8の倍数でない3箇所を8の倍数にしたい。
+        下層ヒーロー124px→120px / インタビューFV132px→128px / 404 172px→168px。
+- 原因: 各 padding-block の上が calc(var(--header-h) + 追加) で 76+48=124 等になっている。
+- 修正方針: 追加値を調整して合計を指定値に:
+        .page-hero  上 calc(76+48)=124 → calc(76+44)=120px（下48pxは維持）
+        .itv-hero   上 calc(76+56)=132 → calc(76+52)=128px（下clamp(48,6vw,80)は維持）
+        .coming-soon上 calc(76+96)=172 → calc(76+92)=168px（下128pxは維持）
+- 対象: assets/css/subpage.css（page-hero, itv-hero）, global.css（coming-soon）

@@ -909,7 +909,8 @@ main,
    Coming Soon（下層ページ仮置き）
 ============================================ */
 .coming-soon {
-  padding-block: calc(var(--header-h) + 96px) 128px;
+  /* ブラッシュアップ(P-023): 上余白を8の倍数に（76+96=172→76+92=168px） */
+  padding-block: calc(var(--header-h) + 92px) 128px;
   min-height: 70vh;
 }
 
