@@ -90,7 +90,7 @@ $aishin_benefits = array(
 function aishin_career_item( $item ) {
 	?>
 	<div class="crr__item" data-reveal>
-		<span class="crr__item-num"><?php echo esc_html( $item['num'] ); ?></span>
+		<?php /* crr__item-num（01,02等の番号）は削除（P-022） */ ?>
 		<h3 class="crr__item-heading"><?php
 		$line_count = count( $item['heading_lines'] );
 		foreach ( $item['heading_lines'] as $j => $line ) {

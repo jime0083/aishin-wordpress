@@ -515,7 +515,8 @@
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   gap: clamp(40px, 6vw, 80px);
-  align-items: center;
+  /* ブラッシュアップ(P-020): ABOUTと同じ上揃えにし、eyebrowと見出しの間隔を12pxに保つ */
+  align-items: start;
 }
 
 .career__lead {

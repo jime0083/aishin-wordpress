@@ -123,9 +123,7 @@ get_template_part( 'template-parts/page-hero', null, array( 'title' => 'SERVICE'
 <section class="section svc <?php echo $aishin_flip ? 'section--tinted' : ''; ?>" id="service-<?php echo esc_attr( $aishin_s['num'] ); ?>">
   <?php get_template_part( 'template-parts/giant-word', null, array( 'text' => $aishin_s['giant'], 'side' => $aishin_flip ? 'left' : 'right' ) ); ?>
   <div class="container">
-    <p class="section__eyebrow" data-reveal>
-      <?php echo esc_html( strtoupper( $aishin_s['title'] ) ); ?>
-    </p>
+    <?php /* section__eyebrow（STRATEGY CONSULTING等のオレンジ文字）は削除（P-021） */ ?>
     <div class="svc__grid <?php echo $aishin_flip ? 'svc__grid--flip' : ''; ?>">
       <div class="svc__media" data-reveal>
         <span class="svc__num" aria-hidden="true"><?php echo esc_html( $aishin_s['num'] ); ?></span>

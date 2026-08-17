@@ -252,3 +252,32 @@ problem.txt — 問題・修正の記録
         (3) P-018 の margin-bottom は 12px（ユーザー明示指定）。
         (4) rem残存チェック（コメント含む）→ ローカル全ページ表示確認。
 - 対象: assets/css/global.css, home.css, subpage.css, CLAUDE.md
+
+## P-020: トップCAREERのeyebrowと見出しの間隔が12pxにならない（ブラッシュアップ）
+- 発生日: 2026-08-17
+- 状態: 修正中
+- 現象: トップのCAREER SUPPORT（eyebrow）と「成長を、仕組みにする。」（見出し）の間隔が
+        P-018で設定した12pxになっておらず、広く見える。
+- 原因: home.css の .career__grid が align-items: center（縦長画像に対しテキストを垂直中央
+        寄せ）。見出しがグリッド中央に下がり、eyebrowから離れる。ABOUTは align-items:start
+        のため間隔が守られている。
+- 修正方針: .career__grid の align-items を center → start に変更（ABOUTと統一）。
+        画像は縦長でグリッド高さを占めるため見た目の変化は最小。
+- 対象: wp-content/themes/aishin/assets/css/home.css
+
+## P-021: SERVICE各セクションのeyebrowラベル（STRATEGY CONSULTING等）を削除（ブラッシュアップ）
+- 発生日: 2026-08-17
+- 状態: 修正中
+- 現象: SERVICE各セクション上部のオレンジ文字（STRATEGY CONSULTING / DX ACCELERATION /
+        NEW BUSINESS DESIGN）を削除したい。
+- 原因: page-service.php に <p class="section__eyebrow">strtoupper(title)</p> がある。
+- 修正方針: page-service.php の section__eyebrow ブロックを削除。
+- 対象: wp-content/themes/aishin/page-service.php
+
+## P-022: CAREERページ各項目の番号（01,02等 crr__item-num）を削除（ブラッシュアップ）
+- 発生日: 2026-08-17
+- 状態: 修正中
+- 現象: CAREERページ各セクション上部の 01/02/03/04 の番号を削除したい。
+- 原因: page-career.php に <span class="crr__item-num">{num}</span> がある。
+- 修正方針: page-career.php から crr__item-num の span を削除。
+- 対象: wp-content/themes/aishin/page-career.php
