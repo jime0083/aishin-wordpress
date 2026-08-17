@@ -628,7 +628,8 @@ Phase 12: デザインブラッシュアップ 第4弾（2026-08-17 ユーザー
     完了条件: 全セクションで英語eyebrowと見出しの間隔が従来の半分になる。
               縮小量(25.6px→12.8px)をユーザーに報告する。
 
-[ ] Phase 12.2 CSSの単位を rem 禁止・全て px に統一（P-019）
+[x] Phase 12.2 CSSの単位を rem 禁止・全て px に統一（P-019）
+    （2026-08-17 完了・本番反映確認済み。269箇所変換・rem残存0）
     対象: assets/css/global.css, home.css, subpage.css, CLAUDE.md
     内容: CLAUDE.mdにルール10追加（済）。3CSSの rem を px へ一括変換
           （1rem=16px・四捨五入で整数px・clamp内も変換・em/vw/%は維持）。P-018は12px。
