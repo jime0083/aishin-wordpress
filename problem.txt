@@ -226,7 +226,7 @@ problem.txt — 問題・修正の記録
 
 ## P-018: 各セクションの英語eyebrowと見出しの間隔を半分に（ブラッシュアップ）
 - 発生日: 2026-08-17
-- 状態: 修正中
+- 状態: 解決済み（2026-08-17。当初0.8rem→ユーザー指示で 12px に確定・px統一）
 - 現象: 全セクションで英語eyebrow（例 ABOUT US）と見出し（例「若さは、武器だ。」）の間の
         空白が広い。これを現在の半分にしたい（サイト内全セクション共通）。
 - 原因: global.css の .section__eyebrow { margin-bottom: 1.6rem; } が間隔の実体。
@@ -237,3 +237,18 @@ problem.txt — 問題・修正の記録
         px換算(1rem=16px): 25.6px → 12.8px。global.cssはReact版無改変移植だが
         ブラッシュアップのため編集可・コメントで明記。
 - 対象: wp-content/themes/aishin/assets/css/global.css
+
+## P-019: CSSの単位を rem 禁止・全て px に統一（ブラッシュアップ・ルール化）
+- 発生日: 2026-08-17
+- 状態: 修正中
+- 現象: サイト内CSSで rem を使わず全て px にしたい（ルール化＋既存rem全変換）。
+        P-018のeyebrow間隔も小数点なしの 12px に。
+- 原因: React版から無改変移植したCSS(global/home/subpage)が rem を多用（計272箇所・
+        うちclamp内60）。PHP/JSには数値remなし。
+- 修正方針:
+        (1) CLAUDE.md にルール10「CSS単位はpx統一・rem禁止」を追加（済）。
+        (2) 3CSSの rem を px に一括変換。1rem=16px・四捨五入で整数px（小数なし）。
+            clamp()内のremも変換（vw等はそのまま）。em/vw/%は対象外。
+        (3) P-018 の margin-bottom は 12px（ユーザー明示指定）。
+        (4) rem残存チェック（コメント含む）→ ローカル全ページ表示確認。
+- 対象: assets/css/global.css, home.css, subpage.css, CLAUDE.md

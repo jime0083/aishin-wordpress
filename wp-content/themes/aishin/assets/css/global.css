@@ -82,7 +82,7 @@ button {
 .container {
   max-width: 1160px;
   margin-inline: auto;
-  padding-inline: clamp(1.25rem, 5vw, 3rem);
+  padding-inline: clamp(20px, 5vw, 48px);
 }
 
 /* 浮遊背景を透かすため、コンテンツは背景レイヤーより上に置く */
@@ -96,7 +96,7 @@ main,
 .section {
   position: relative;
   overflow: hidden;
-  padding-block: clamp(5rem, 10vw, 8.5rem);
+  padding-block: clamp(80px, 10vw, 136px);
 }
 
 .section > .container {
@@ -114,11 +114,11 @@ main,
   gap: 0.75em;
   font-family: var(--font-en);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 14px;
   letter-spacing: 0.22em;
   color: var(--orange);
-  /* ブラッシュアップ(P-018): eyebrowと見出しの間隔を半分に（1.6rem=25.6px → 0.8rem=12.8px） */
-  margin-bottom: 0.8rem;
+  /* ブラッシュアップ(P-018): eyebrowと見出しの間隔を半分に（25.6px → 12px・px統一/小数なし） */
+  margin-bottom: 12px;
 }
 
 .section__eyebrow-num {
@@ -134,7 +134,7 @@ main,
 
 .section__title {
   font-weight: 900;
-  font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+  font-size: clamp(27px, 3.6vw, 43px);
   line-height: 1.5;
   letter-spacing: 0.02em;
 }
@@ -144,8 +144,8 @@ main,
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 1.5rem 2rem;
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  gap: 24px 32px;
+  margin-bottom: clamp(40px, 5vw, 64px);
 }
 
 .u-accent {
@@ -161,7 +161,7 @@ main,
   gap: 0.5em;
   font-family: var(--font-en);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 14px;
   letter-spacing: 0.14em;
   padding-bottom: 0.35em;
   border-bottom: 2px solid var(--ink);
@@ -205,7 +205,7 @@ main,
   align-items: center;
   justify-content: space-between;
   height: var(--header-h);
-  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+  padding-inline: clamp(20px, 4vw, 40px);
 }
 
 .header__logo {
@@ -214,7 +214,7 @@ main,
   gap: 0.55em;
   font-family: var(--font-en);
   font-weight: 800;
-  font-size: 1.35rem;
+  font-size: 22px;
   letter-spacing: 0.06em;
   z-index: 102;
   position: relative;
@@ -236,14 +236,14 @@ main,
 .header__nav {
   display: flex;
   align-items: center;
-  gap: clamp(1.2rem, 2.4vw, 2.2rem);
+  gap: clamp(19px, 2.4vw, 35px);
 }
 
 .header__link {
   position: relative;
   font-family: var(--font-en);
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 13px;
   letter-spacing: 0.14em;
   padding-block: 0.4em;
 }
@@ -270,7 +270,7 @@ main,
 .header__entry {
   font-family: var(--font-en);
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 13px;
   letter-spacing: 0.14em;
   color: #fff;
   background: var(--ink);
@@ -341,13 +341,13 @@ main,
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.4rem;
+  gap: 22px;
 }
 
 .header__drawer-link {
   font-family: var(--font-en);
   font-weight: 800;
-  font-size: clamp(1.8rem, 7vw, 2.6rem);
+  font-size: clamp(29px, 7vw, 42px);
   letter-spacing: 0.08em;
   opacity: 0;
   transform: translateY(20px);
@@ -382,7 +382,7 @@ main,
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 8px;
   width: 100%;
   background: #efe7d8;
   border: 2px dashed #d3c4ab;
@@ -422,7 +422,7 @@ main,
   position: relative;
   font-family: var(--font-en);
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 13px;
   letter-spacing: 0.12em;
   background: var(--paper);
   padding: 0.3em 1em;
@@ -432,7 +432,7 @@ main,
 
 .img-ph__label {
   position: relative;
-  font-size: 0.72rem;
+  font-size: 12px;
   text-align: center;
   padding-inline: 1em;
   line-height: 1.6;
@@ -613,11 +613,11 @@ main,
 ============================================ */
 .giant-word {
   position: absolute;
-  top: 0.4rem;
+  top: 6px;
   z-index: 0;
   font-family: var(--font-en);
   font-weight: 800;
-  font-size: clamp(5rem, 17vw, 15rem);
+  font-size: clamp(80px, 17vw, 240px);
   line-height: 1;
   white-space: nowrap;
   color: transparent;
@@ -652,7 +652,7 @@ main,
 
 .marquee--tilt {
   transform: rotate(-1.6deg) scale(1.03);
-  margin-block: clamp(1rem, 3vw, 2rem) -1rem;
+  margin-block: clamp(16px, 3vw, 32px) -16px;
 }
 
 .marquee__track {
@@ -664,7 +664,7 @@ main,
 .marquee__text {
   font-family: var(--font-en);
   font-weight: 800;
-  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  font-size: clamp(18px, 2.2vw, 26px);
   letter-spacing: 0.08em;
   color: #fff;
   white-space: nowrap;
@@ -717,7 +717,7 @@ main,
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .loader__brand {
@@ -726,7 +726,7 @@ main,
   gap: 0.4em;
   font-family: var(--font-en);
   font-weight: 800;
-  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-size: clamp(19px, 3vw, 29px);
   letter-spacing: 0.08em;
   overflow: hidden;
 }
@@ -748,7 +748,7 @@ main,
 .loader__count {
   font-family: var(--font-en);
   font-weight: 800;
-  font-size: clamp(4rem, 15vw, 9.5rem);
+  font-size: clamp(64px, 15vw, 152px);
   line-height: 1;
   letter-spacing: 0.02em;
 }
@@ -761,11 +761,11 @@ main,
 
 .loader__tag {
   position: absolute;
-  left: clamp(1.25rem, 4vw, 2.5rem);
-  bottom: 2rem;
+  left: clamp(20px, 4vw, 40px);
+  bottom: 32px;
   font-family: var(--font-en);
   font-weight: 700;
-  font-size: 0.7rem;
+  font-size: 11px;
   letter-spacing: 0.3em;
   color: var(--ink-soft);
 }
@@ -833,7 +833,7 @@ main,
   transform: translate(-50%, -50%);
   font-family: var(--font-en);
   font-weight: 700;
-  font-size: 0.62rem;
+  font-size: 10px;
   letter-spacing: 0.14em;
   color: #fff;
   opacity: 0;
@@ -851,22 +851,22 @@ main,
 .footer {
   background: var(--paper-2);
   border-top: 1px solid var(--line);
-  padding-block: 4rem 2rem;
+  padding-block: 64px 32px;
 }
 
 .footer__top {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 2.5rem;
-  margin-bottom: 3rem;
+  gap: 40px;
+  margin-bottom: 48px;
 }
 
 .footer__logo {
   display: inline-block;
   font-family: var(--font-en);
   font-weight: 800;
-  font-size: 1.6rem;
+  font-size: 26px;
   letter-spacing: 0.06em;
 }
 
@@ -883,13 +883,13 @@ main,
 .footer__nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.2rem 2rem;
+  gap: 19px 32px;
 }
 
 .footer__link {
   font-family: var(--font-en);
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 13px;
   letter-spacing: 0.14em;
   transition: color 0.25s ease;
 }
@@ -900,23 +900,23 @@ main,
 
 .footer__bottom {
   border-top: 1px solid var(--line);
-  padding-top: 1.5rem;
+  padding-top: 24px;
   color: var(--ink-soft);
-  font-size: 0.75rem;
+  font-size: 12px;
 }
 
 /* ============================================
    Coming Soon（下層ページ仮置き）
 ============================================ */
 .coming-soon {
-  padding-block: calc(var(--header-h) + 6rem) 8rem;
+  padding-block: calc(var(--header-h) + 96px) 128px;
   min-height: 70vh;
 }
 
 .coming-soon__title {
   font-family: var(--font-en);
   font-weight: 800;
-  font-size: clamp(2.6rem, 8vw, 5rem);
+  font-size: clamp(42px, 8vw, 80px);
   letter-spacing: 0.04em;
   line-height: 1.1;
 }
@@ -924,10 +924,10 @@ main,
 .coming-soon__jp {
   color: var(--orange);
   font-weight: 700;
-  margin-top: 0.6rem;
+  margin-top: 10px;
 }
 
 .coming-soon__note {
   color: var(--ink-soft);
-  margin-block: 1.5rem 2.5rem;
+  margin-block: 24px 40px;
 }
