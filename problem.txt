@@ -223,3 +223,17 @@ problem.txt — 問題・修正の記録
 - 修正方針: single-interview.php の eyebrow を「REASON」+ ゼロ埋め番号（'0'.$aishin_n）に
         変更。表記は「REASON01」等（半角数字2桁）。他セクションの数字削除(P-007)は維持。
 - 対象: wp-content/themes/aishin/single-interview.php
+
+## P-018: 各セクションの英語eyebrowと見出しの間隔を半分に（ブラッシュアップ）
+- 発生日: 2026-08-17
+- 状態: 修正中
+- 現象: 全セクションで英語eyebrow（例 ABOUT US）と見出し（例「若さは、武器だ。」）の間の
+        空白が広い。これを現在の半分にしたい（サイト内全セクション共通）。
+- 原因: global.css の .section__eyebrow { margin-bottom: 1.6rem; } が間隔の実体。
+        section__eyebrow は全セクション共通クラスのため、ここを変えれば全体に適用。
+        ※home.css @media(max-width:900px) の .about/.career eyebrow margin-bottom:0 は
+          モバイルのグリッド分解(display:contents)用の別処理で、今回の対象外。
+- 修正方針: .section__eyebrow の margin-bottom を 1.6rem → 0.8rem（半分）に変更。
+        px換算(1rem=16px): 25.6px → 12.8px。global.cssはReact版無改変移植だが
+        ブラッシュアップのため編集可・コメントで明記。
+- 対象: wp-content/themes/aishin/assets/css/global.css

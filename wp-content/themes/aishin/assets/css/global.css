@@ -117,7 +117,8 @@ main,
   font-size: 0.85rem;
   letter-spacing: 0.22em;
   color: var(--orange);
-  margin-bottom: 1.6rem;
+  /* ブラッシュアップ(P-018): eyebrowと見出しの間隔を半分に（1.6rem=25.6px → 0.8rem=12.8px） */
+  margin-bottom: 0.8rem;
 }
 
 .section__eyebrow-num {
